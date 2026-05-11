@@ -1,6 +1,6 @@
 # Calculadora Simple
 
-Una calculadora de linea de comandos escrita en Python.
+Una calculadora de línea de comandos escrita en Python.
 
 ## Uso
 
@@ -17,4 +17,4 @@ python calculadora.py
 
 ## Requisitos
 
-- Python 3.8 o superor
+- Python 3.8 o superior
