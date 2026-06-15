@@ -75,7 +75,9 @@
   .hero p { font-size: 1.15rem; opacity: .95; margin-bottom: 28px; }
   .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
   .btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     background: #25D366;
     color: #fff;
     padding: 14px 32px;
@@ -90,7 +92,9 @@
   }
   .btn:hover { transform: translateY(-2px); }
   .btn-outline {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     border: 2px solid #fff;
     color: #fff;
     padding: 12px 30px;
@@ -111,7 +115,7 @@
     border-bottom: 1px solid #e5e7eb;
   }
   .stats-bar .stat { text-align: center; }
-  .stats-bar .num { font-size: 1.8rem; font-weight: 800; color: var(--primary-dark); }
+  .stats-bar .num { font-size: 1.8rem; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; justify-content: center; gap: 6px; }
   .stats-bar .label { color: var(--muted); font-size: .85rem; }
 
   section { padding: 70px 20px; max-width: 1100px; margin: 0 auto; }
@@ -140,7 +144,17 @@
   .service-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,.08); }
   .service-card .img { height: 150px; background-size: cover; background-position: center; }
   .service-card .body { padding: 22px; }
-  .service-card .icon { font-size: 1.8rem; margin-bottom: 8px; }
+  .service-card .icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--bg);
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
   .service-card h3 { margin-bottom: 8px; font-size: 1.1rem; }
   .service-card p { color: var(--muted); font-size: .95rem; }
 
@@ -166,7 +180,23 @@
   .about-text h2 { font-size: 2rem; margin-bottom: 16px; }
   .about-text p { color: var(--muted); margin-bottom: 20px; }
   .checklist { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-  .checklist li::before { content: "✅ "; }
+  .checklist li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .checklist li .icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .checklist li .icon-wrap .icon { width: 14px; height: 14px; }
 
   /* Testimonials */
   .testimonials { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
@@ -194,7 +224,7 @@
   .contact-info-panel p.lead { opacity: .9; margin-bottom: 30px; }
   .contact-rows { display: flex; flex-direction: column; gap: 18px; margin-bottom: 30px; }
   .contact-row { display: flex; gap: 14px; align-items: flex-start; }
-  .contact-row .icon { font-size: 1.4rem; }
+  .contact-row .icon { display: flex; align-items: center; }
   .contact-row .txt strong { display: block; }
   .contact-row .txt span { opacity: .85; font-size: .92rem; }
   .map-panel iframe { width: 100%; height: 100%; min-height: 360px; border: 0; display: block; }
@@ -242,6 +272,8 @@
     70% { box-shadow: 0 0 0 14px rgba(37,211,102,0); }
     100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
   }
+  .icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+
   /* Scroll-reveal animations */
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
   .reveal.visible { opacity: 1; transform: translateY(0); }
@@ -275,10 +307,17 @@
     font-weight: 700;
     box-shadow: 0 4px 12px rgba(0,0,0,.25);
     z-index: 999;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
 </style>
 </head>
 <body>
+
+{% macro icon(name, size=20) -%}
+<svg class="icon" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ icons.get(name, '') | safe }}</svg>
+{%- endmacro %}
 
 <div class="navbar">
   <div class="brand">{{ business_name }}</div>
@@ -287,7 +326,7 @@
     <a href="#nosotros">Nosotros</a>
     <a href="#galeria">Galeria</a>
     <a href="#contacto">Contacto</a>
-    <a class="nav-cta" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noreferrer">WhatsApp</a>
+    <a class="nav-cta" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noreferrer">{{ icon('message-circle', 16) }} WhatsApp</a>
   </nav>
 </div>
 
@@ -297,8 +336,8 @@
     <h1>{{ business_name }}</h1>
     <p>{{ tagline }}</p>
     <div class="hero-actions">
-      <a class="btn" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noreferrer">📱 Escribenos por WhatsApp</a>
-      {% if phone %}<a class="btn-outline" href="tel:{{ phone }}">📞 Llamar ahora</a>{% endif %}
+      <a class="btn" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noreferrer">{{ icon('message-circle', 18) }} Escribenos por WhatsApp</a>
+      {% if phone %}<a class="btn-outline" href="tel:{{ phone }}">{{ icon('phone', 18) }} Llamar ahora</a>{% endif %}
     </div>
   </div>
 </header>
@@ -306,7 +345,7 @@
 {% if rating or reviews_count %}
 <div class="stats-bar reveal-stagger reveal">
   {% if rating %}
-  <div class="stat"><div class="num" data-count="{{ rating }}" data-suffix="⭐">0</div><div class="label">Calificacion en Google</div></div>
+  <div class="stat"><div class="num">{{ icon('star', 18) }} <span data-count="{{ rating }}">0</span></div><div class="label">Calificacion en Google</div></div>
   {% endif %}
   {% if reviews_count %}
   <div class="stat"><div class="num" data-count="{{ reviews_count }}" data-suffix="+">0</div><div class="label">Clientes satisfechos</div></div>
@@ -325,7 +364,7 @@
     <div class="service-card">
       <div class="img" style="background-image: url('{{ service.image }}')"></div>
       <div class="body">
-        <div class="icon">{{ service.icon }}</div>
+        <div class="icon-wrap">{{ icon(service.icon, 22) }}</div>
         <h3>{{ service.title }}</h3>
         <p>{{ service.description }}</p>
       </div>
@@ -358,7 +397,7 @@
       <p>{{ about_text }}</p>
       <ul class="checklist">
         {% for item in highlights %}
-        <li>{{ item }}</li>
+        <li><span class="icon-wrap">{{ icon('check') }}</span>{{ item }}</li>
         {% endfor %}
       </ul>
     </div>
@@ -374,23 +413,23 @@
         <p class="lead">Escribenos hoy mismo y recibe atencion personalizada.</p>
         <div class="contact-rows">
           <div class="contact-row">
-            <div class="icon">📍</div>
+            <div class="icon">{{ icon('map-pin', 22) }}</div>
             <div class="txt"><strong>Direccion</strong><span>{{ address }}</span></div>
           </div>
           {% if phone %}
           <div class="contact-row">
-            <div class="icon">📞</div>
+            <div class="icon">{{ icon('phone', 22) }}</div>
             <div class="txt"><strong>Telefono</strong><span>{{ phone }}</span></div>
           </div>
           {% endif %}
           {% if email %}
           <div class="contact-row">
-            <div class="icon">✉️</div>
+            <div class="icon">{{ icon('mail', 22) }}</div>
             <div class="txt"><strong>Email</strong><span>{{ email }}</span></div>
           </div>
           {% endif %}
           <div class="contact-row">
-            <div class="icon">🕒</div>
+            <div class="icon">{{ icon('clock', 22) }}</div>
             <div class="txt"><strong>Horario</strong><span>Lunes a Sabado, 8:00am - 6:00pm</span></div>
           </div>
         </div>
@@ -417,8 +456,8 @@
   <p style="margin-top: 10px;">&copy; {{ year }} {{ business_name }}. Todos los derechos reservados.</p>
 </footer>
 
-<a class="whatsapp-float" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noreferrer" title="Escribenos por WhatsApp">💬</a>
-<div class="demo-badge">🚀 DEMO — Sitio de muestra</div>
+<a class="whatsapp-float" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noreferrer" title="Escribenos por WhatsApp">{{ icon('message-circle', 26) }}</a>
+<div class="demo-badge">{{ icon('zap', 16) }} DEMO — Sitio de muestra</div>
 
 <script>
   var revealEls = document.querySelectorAll('.reveal');

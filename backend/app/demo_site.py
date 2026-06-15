@@ -168,94 +168,135 @@ NICHE_IMAGES = {
     "mercado latino": _set("market1", "food1", ["market1", "food1", "bakery1", "restaurant1", "bakery2"], ["market1", "food1", "bakery1"]),
 }
 
+# Iconos profesionales en SVG (estilo lineas, sin emojis). Cada valor es el
+# contenido interno de un <svg viewBox="0 0 24 24"> con stroke="currentColor".
+ICON_PATHS = {
+    "award": '<circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>',
+    "file-text": '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+    "users": '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    "activity": '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+    "calendar": '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+    "credit-card": '<rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>',
+    "scissors": '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/>',
+    "droplet": '<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+    "gift": '<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>',
+    "home": '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+    "bar-chart": '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+    "key": '<circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/>',
+    "tool": '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+    "clipboard": '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>',
+    "truck": '<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+    "car": '<path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="1" y="11" width="22" height="6" rx="2"/><circle cx="7" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/>',
+    "settings": '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+    "clock": '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    "trending-up": '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+    "phone": '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
+    "heart": '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+    "sun": '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
+    "leaf": '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+    "camera": '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+    "utensils": '<path d="M3 2v7c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>',
+    "book": '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+    "shopping-bag": '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+    "dollar-sign": '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+    "star": '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    "message-circle": '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>',
+    "check": '<polyline points="20 6 9 17 4 12"/>',
+    "map-pin": '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+    "mail": '<path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/>',
+    "send": '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+    "zap": '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+}
+
+
 # Textos (servicios + highlights) por categoria, usados cuando el nicho no
 # tiene un set propio o como base para los titulos/descripciones.
 CATEGORY_TEXT = {
     "Legal": {
         "services": [
-            {"icon": "⚖️", "title": "Consultas legales", "description": "Asesoria personalizada para tu caso."},
-            {"icon": "📄", "title": "Tramites y documentos", "description": "Preparacion y revision de documentos legales."},
-            {"icon": "🤝", "title": "Representacion", "description": "Te acompañamos en todo el proceso."},
+            {"icon": "award", "title": "Consultas legales", "description": "Asesoria personalizada para tu caso."},
+            {"icon": "file-text", "title": "Tramites y documentos", "description": "Preparacion y revision de documentos legales."},
+            {"icon": "users", "title": "Representacion", "description": "Te acompañamos en todo el proceso."},
         ],
         "highlights": ["Mas de 10 años de experiencia", "Consulta inicial sin costo", "Atencion en español e ingles"],
     },
     "Salud": {
         "services": [
-            {"icon": "🩺", "title": "Consultas y diagnostico", "description": "Atencion profesional y personalizada."},
-            {"icon": "📅", "title": "Citas flexibles", "description": "Horarios que se adaptan a tu rutina."},
-            {"icon": "💳", "title": "Planes de pago", "description": "Opciones de financiamiento disponibles."},
+            {"icon": "activity", "title": "Consultas y diagnostico", "description": "Atencion profesional y personalizada."},
+            {"icon": "calendar", "title": "Citas flexibles", "description": "Horarios que se adaptan a tu rutina."},
+            {"icon": "credit-card", "title": "Planes de pago", "description": "Opciones de financiamiento disponibles."},
         ],
         "highlights": ["Equipos modernos y certificados", "Personal con amplia experiencia", "Aceptamos seguros y planes de pago"],
     },
     "Belleza": {
         "services": [
-            {"icon": "✂️", "title": "Cortes y estilos", "description": "Tendencias y servicios personalizados."},
-            {"icon": "💆", "title": "Tratamientos", "description": "Cuidado profesional para ti."},
-            {"icon": "🎁", "title": "Paquetes y promociones", "description": "Combina servicios y ahorra."},
+            {"icon": "scissors", "title": "Cortes y estilos", "description": "Tendencias y servicios personalizados."},
+            {"icon": "droplet", "title": "Tratamientos", "description": "Cuidado profesional para ti."},
+            {"icon": "gift", "title": "Paquetes y promociones", "description": "Combina servicios y ahorra."},
         ],
         "highlights": ["Productos de alta calidad", "Ambiente relajante y limpio", "Promociones para nuevos clientes"],
     },
     "Bienes raices": {
         "services": [
-            {"icon": "🏠", "title": "Compra y venta", "description": "Te ayudamos a encontrar tu proxima propiedad."},
-            {"icon": "📊", "title": "Avaluos", "description": "Conoce el valor real de tu propiedad."},
-            {"icon": "🔑", "title": "Administracion", "description": "Gestion integral de propiedades en renta."},
+            {"icon": "home", "title": "Compra y venta", "description": "Te ayudamos a encontrar tu proxima propiedad."},
+            {"icon": "bar-chart", "title": "Avaluos", "description": "Conoce el valor real de tu propiedad."},
+            {"icon": "key", "title": "Administracion", "description": "Gestion integral de propiedades en renta."},
         ],
         "highlights": ["Asesoria personalizada en cada paso", "Amplia cartera de propiedades", "Negociacion profesional"],
     },
     "Hogar y construccion": {
         "services": [
-            {"icon": "🔧", "title": "Reparaciones", "description": "Servicio rapido y garantizado."},
-            {"icon": "📋", "title": "Presupuestos gratis", "description": "Cotizacion sin costo, sin compromiso."},
-            {"icon": "🚐", "title": "Servicio a domicilio", "description": "Vamos a tu casa o negocio."},
+            {"icon": "tool", "title": "Reparaciones", "description": "Servicio rapido y garantizado."},
+            {"icon": "clipboard", "title": "Presupuestos gratis", "description": "Cotizacion sin costo, sin compromiso."},
+            {"icon": "truck", "title": "Servicio a domicilio", "description": "Vamos a tu casa o negocio."},
         ],
         "highlights": ["Mano de obra garantizada", "Materiales de calidad", "Presupuesto claro desde el inicio"],
     },
     "Automotriz": {
         "services": [
-            {"icon": "🚗", "title": "Diagnostico", "description": "Revision completa de tu vehiculo."},
-            {"icon": "🔩", "title": "Reparaciones", "description": "Repuestos de calidad y mano de obra garantizada."},
-            {"icon": "⏱️", "title": "Servicio rapido", "description": "Minimiza el tiempo sin tu vehiculo."},
+            {"icon": "car", "title": "Diagnostico", "description": "Revision completa de tu vehiculo."},
+            {"icon": "settings", "title": "Reparaciones", "description": "Repuestos de calidad y mano de obra garantizada."},
+            {"icon": "clock", "title": "Servicio rapido", "description": "Minimiza el tiempo sin tu vehiculo."},
         ],
         "highlights": ["Tecnicos certificados", "Diagnostico computarizado", "Garantia en reparaciones"],
     },
     "Finanzas": {
         "services": [
-            {"icon": "📈", "title": "Asesoria financiera", "description": "Planeacion personalizada para tu negocio o familia."},
-            {"icon": "🧾", "title": "Impuestos", "description": "Declaraciones y cumplimiento al dia."},
-            {"icon": "📞", "title": "Consultas gratuitas", "description": "Primera consulta sin costo."},
+            {"icon": "trending-up", "title": "Asesoria financiera", "description": "Planeacion personalizada para tu negocio o familia."},
+            {"icon": "file-text", "title": "Impuestos", "description": "Declaraciones y cumplimiento al dia."},
+            {"icon": "phone", "title": "Consultas gratuitas", "description": "Primera consulta sin costo."},
         ],
         "highlights": ["Atencion personalizada", "Confidencialidad garantizada", "Resultados comprobados"],
     },
     "Fitness": {
         "services": [
-            {"icon": "💪", "title": "Entrenamiento personalizado", "description": "Planes adaptados a tus objetivos."},
-            {"icon": "🧘", "title": "Clases grupales", "description": "Horarios variados para toda la familia."},
-            {"icon": "🥗", "title": "Asesoria nutricional", "description": "Acompañamiento integral para tus metas."},
+            {"icon": "heart", "title": "Entrenamiento personalizado", "description": "Planes adaptados a tus objetivos."},
+            {"icon": "sun", "title": "Clases grupales", "description": "Horarios variados para toda la familia."},
+            {"icon": "leaf", "title": "Asesoria nutricional", "description": "Acompañamiento integral para tus metas."},
         ],
         "highlights": ["Instructores certificados", "Instalaciones limpias y modernas", "Primera clase gratis"],
     },
     "Eventos": {
         "services": [
-            {"icon": "🎉", "title": "Planeacion completa", "description": "Nos encargamos de cada detalle de tu evento."},
-            {"icon": "📸", "title": "Cobertura profesional", "description": "Capturamos cada momento especial."},
-            {"icon": "🍽️", "title": "Servicio personalizado", "description": "Opciones a tu medida para tu ocasion."},
+            {"icon": "star", "title": "Planeacion completa", "description": "Nos encargamos de cada detalle de tu evento."},
+            {"icon": "camera", "title": "Cobertura profesional", "description": "Capturamos cada momento especial."},
+            {"icon": "utensils", "title": "Servicio personalizado", "description": "Opciones a tu medida para tu ocasion."},
         ],
         "highlights": ["Experiencia en eventos de toda escala", "Atencion cercana y profesional", "Paquetes flexibles"],
     },
     "Educacion": {
         "services": [
-            {"icon": "📚", "title": "Programas personalizados", "description": "Adaptados al ritmo de cada estudiante."},
-            {"icon": "👩‍🏫", "title": "Profesores calificados", "description": "Equipo con experiencia comprobada."},
-            {"icon": "🕒", "title": "Horarios flexibles", "description": "Opciones para toda la familia."},
+            {"icon": "book", "title": "Programas personalizados", "description": "Adaptados al ritmo de cada estudiante."},
+            {"icon": "users", "title": "Profesores calificados", "description": "Equipo con experiencia comprobada."},
+            {"icon": "clock", "title": "Horarios flexibles", "description": "Opciones para toda la familia."},
         ],
         "highlights": ["Ambiente seguro y acogedor", "Seguimiento cercano del progreso", "Inscripciones abiertas todo el año"],
     },
     "Comunidad hispana": {
         "services": [
-            {"icon": "🛍️", "title": "Productos y servicios", "description": "Todo lo que necesitas en un solo lugar."},
-            {"icon": "💵", "title": "Atencion rapida", "description": "Te atendemos en español sin complicaciones."},
-            {"icon": "🤝", "title": "Confianza y cercania", "description": "Servicio honesto para nuestra comunidad."},
+            {"icon": "shopping-bag", "title": "Productos y servicios", "description": "Todo lo que necesitas en un solo lugar."},
+            {"icon": "dollar-sign", "title": "Atencion rapida", "description": "Te atendemos en español sin complicaciones."},
+            {"icon": "users", "title": "Confianza y cercania", "description": "Servicio honesto para nuestra comunidad."},
         ],
         "highlights": ["Atencion en español", "Precios justos", "Ubicacion accesible"],
     },
@@ -263,9 +304,9 @@ CATEGORY_TEXT = {
 
 DEFAULT_TEXT = {
     "services": [
-        {"icon": "⭐", "title": "Calidad garantizada", "description": "Trabajo profesional respaldado por nuestra experiencia."},
-        {"icon": "📅", "title": "Atencion rapida", "description": "Respondemos a la brevedad para agendar tu servicio."},
-        {"icon": "💬", "title": "Atencion personalizada", "description": "Te escuchamos para ofrecerte la mejor solucion."},
+        {"icon": "star", "title": "Calidad garantizada", "description": "Trabajo profesional respaldado por nuestra experiencia."},
+        {"icon": "calendar", "title": "Atencion rapida", "description": "Respondemos a la brevedad para agendar tu servicio."},
+        {"icon": "message-circle", "title": "Atencion personalizada", "description": "Te escuchamos para ofrecerte la mejor solucion."},
     ],
     "highlights": ["Atencion profesional y de confianza", "Precios justos y transparentes", "Clientes satisfechos en toda la zona"],
 }
@@ -362,6 +403,7 @@ def build_demo_html(lead, category: str = "") -> str:
         map_embed_url=map_embed_url,
         primary_color=primary_color,
         primary_color_dark=primary_color_dark,
+        icons=ICON_PATHS,
         lang="es",
         year=2026,
     )
