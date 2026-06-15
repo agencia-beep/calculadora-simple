@@ -268,7 +268,11 @@ def generate_demo(lead_id: int, client: Client = Depends(get_current_client), db
     lead.updated_at = datetime.utcnow()
     db.commit()
 
-    return {"slug": result["slug"], "preview_path": f"/demos/{result['slug']}/index.html"}
+    return {
+        "slug": result["slug"],
+        "preview_path": f"/demos/{result['slug']}/index.html",
+        "public_url": result["public_url"],
+    }
 
 
 @app.delete("/api/leads/{lead_id}")

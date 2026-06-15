@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { generateDemo, generateMessages } from "../api";
 
+const DEMO_PUBLIC_BASE_URL = "https://agencia-beep.github.io/calculadora-simple";
+
 export default function LeadModal({ lead, onClose, onUpdated }) {
   const [current, setCurrent] = useState(lead);
   const [loading, setLoading] = useState(false);
@@ -97,7 +99,7 @@ export default function LeadModal({ lead, onClose, onUpdated }) {
             {current.demo_slug && (
               <a
                 className="btn btn-secondary btn-small"
-                href={`/demos/${current.demo_slug}/index.html`}
+                href={`${DEMO_PUBLIC_BASE_URL}/demos/${current.demo_slug}/index.html`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -107,12 +109,33 @@ export default function LeadModal({ lead, onClose, onUpdated }) {
           </div>
           <p style={{ color: "var(--color-text-muted)", fontSize: 13, marginTop: 8 }}>
             {current.demo_slug
-              ? "Demo generada. Abrela para revisarla antes de enviarla al cliente."
+              ? "Demo publicada. Comparte este link con el cliente:"
               : "Genera una pagina web demo de ejemplo para este negocio (util si no tiene website)."}
           </p>
+          {current.demo_slug && (
+            <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
+              <input
+                readOnly
+                value={`${DEMO_PUBLIC_BASE_URL}/demos/${current.demo_slug}/index.html`}
+                onClick={(e) => e.target.select()}
+                style={{ flex: 1, fontSize: 12, padding: "6px 8px" }}
+              />
+              <button
+                className="btn btn-secondary btn-small"
+                onClick={() => copyToClipboard(`${DEMO_PUBLIC_BASE_URL}/demos/${current.demo_slug}/index.html`)}
+              >
+                Copiar
+              </button>
+            </div>
+          )}
           <button className="btn btn-secondary btn-small" onClick={handleGenerateDemo} disabled={demoLoading}>
-            {demoLoading ? "Generando..." : current.demo_slug ? "Regenerar demo" : "Generar demo"}
+            {demoLoading ? "Generando y publicando..." : current.demo_slug ? "Regenerar demo" : "Generar demo"}
           </button>
+          {demoLoading && (
+            <p style={{ color: "var(--color-text-muted)", fontSize: 12, marginTop: 6 }}>
+              Esto publica el cambio en GitHub Pages, puede tardar 1-2 minutos en verse reflejado.
+            </p>
+          )}
         </div>
 
         <div className="modal-actions">

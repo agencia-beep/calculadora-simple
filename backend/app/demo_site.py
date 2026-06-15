@@ -10,6 +10,7 @@ vea relevante al tipo de negocio.
 """
 
 import re
+import subprocess
 import unicodedata
 from pathlib import Path
 from urllib.parse import quote
@@ -19,6 +20,8 @@ from jinja2 import Environment, FileSystemLoader
 APP_DIR = Path(__file__).resolve().parent
 REPO_ROOT = APP_DIR.parent.parent
 DEMOS_DIR = REPO_ROOT / "docs" / "demos"
+
+PUBLIC_BASE_URL = "https://agencia-beep.github.io/calculadora-simple"
 
 _env = Environment(loader=FileSystemLoader(str(APP_DIR)), autoescape=True)
 
@@ -378,8 +381,38 @@ def generate_demo_for_lead(lead, category: str = "") -> dict:
     out_file = out_dir / "index.html"
     out_file.write_text(html, encoding="utf-8")
 
+    relative_path = f"demos/{slug}/index.html"
+    _publish_to_github_pages(out_file, slug)
+
     return {
         "slug": slug,
-        "relative_path": f"demos/{slug}/index.html",
+        "relative_path": relative_path,
         "file_path": str(out_file),
+        "public_url": f"{PUBLIC_BASE_URL}/{relative_path}",
     }
+
+
+def _publish_to_github_pages(out_file: Path, slug: str) -> None:
+    """Hace commit y push del demo generado para que quede disponible en GitHub Pages.
+
+    Falla en silencio (solo log) si git no esta disponible o no hay nada que
+    commitear, para no romper la generacion del demo si la publicacion falla.
+    """
+    try:
+        rel = str(out_file.relative_to(REPO_ROOT))
+        subprocess.run(["git", "add", rel], cwd=REPO_ROOT, check=True, capture_output=True)
+        status = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"], cwd=REPO_ROOT, capture_output=True
+        )
+        if status.returncode == 0:
+            return  # no hay cambios que publicar
+
+        subprocess.run(
+            ["git", "commit", "-m", f"Demo: actualizar {slug}"],
+            cwd=REPO_ROOT,
+            check=True,
+            capture_output=True,
+        )
+        subprocess.run(["git", "push"], cwd=REPO_ROOT, check=True, capture_output=True)
+    except Exception as exc:  # pragma: no cover - publicacion best-effort
+        print(f"[demo_site] No se pudo publicar el demo en GitHub Pages: {exc}")
