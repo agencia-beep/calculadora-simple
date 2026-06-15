@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Haoyunlai Massage Spa</title>
+<meta name="description" content="Haoyunlai Massage Spa - spa en orlando. Atencion profesional y de confianza en orlando." />
+<style>
+  :root {
+    --primary: #db2777;
+    --primary-dark: #9d174d;
+    --dark: #111827;
+    --muted: #6b7280;
+    --bg: #f9fafb;
+    --light: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+  html { scroll-behavior: smooth; }
+  body { color: var(--dark); line-height: 1.6; background: var(--light); }
+  a { color: inherit; }
+
+  /* Navbar */
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+  }
+  .navbar .brand { font-weight: 800; font-size: 1.2rem; color: var(--primary-dark); }
+  .navbar nav { display: flex; gap: 22px; }
+  .navbar nav a { text-decoration: none; color: var(--dark); font-weight: 600; font-size: .95rem; }
+  .navbar nav a:hover { color: var(--primary); }
+  .navbar .nav-cta {
+    background: var(--primary);
+    color: #fff !important;
+    padding: 8px 18px;
+    border-radius: 24px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: .9rem;
+  }
+  @media (max-width: 700px) { .navbar nav a:not(.nav-cta) { display: none; } }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    min-height: 480px;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    background: linear-gradient(135deg, rgba(0,0,0,.55), rgba(0,0,0,.35)),
+      url('https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?w=1600&amp;q=75&amp;auto=format&amp;fit=crop') center/cover no-repeat;
+    text-align: center;
+    padding: 80px 20px;
+  }
+  .hero-content { max-width: 720px; margin: 0 auto; }
+  .hero .eyebrow {
+    display: inline-block;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.35);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: .8rem;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .hero h1 { font-size: 2.8rem; margin-bottom: 14px; }
+  .hero p { font-size: 1.15rem; opacity: .95; margin-bottom: 28px; }
+  .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #25D366;
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.02rem;
+    box-shadow: 0 4px 14px rgba(0,0,0,.25);
+    border: none;
+    cursor: pointer;
+    transition: transform .15s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 2px solid #fff;
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .btn-primary { background: var(--primary); }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+    background: var(--bg);
+    padding: 28px 20px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .stats-bar .stat { text-align: center; }
+  .stats-bar .num { font-size: 1.8rem; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .stats-bar .label { color: var(--muted); font-size: .85rem; }
+
+  section { padding: 70px 20px; max-width: 1100px; margin: 0 auto; }
+  .section-tag {
+    display: block;
+    text-align: center;
+    color: var(--primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: .8rem;
+    margin-bottom: 8px;
+  }
+  .section-title { text-align: center; font-size: 2.1rem; margin-bottom: 16px; color: var(--dark); }
+  .section-subtitle { text-align: center; color: var(--muted); max-width: 600px; margin: 0 auto 44px; }
+
+  /* Services */
+  .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 26px; }
+  .service-card {
+    background: var(--light);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .service-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,.08); }
+  .service-card .img { height: 150px; background-size: cover; background-position: center; }
+  .service-card .body { padding: 22px; }
+  .service-card .icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--bg);
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
+  .service-card h3 { margin-bottom: 8px; font-size: 1.1rem; }
+  .service-card p { color: var(--muted); font-size: .95rem; }
+
+  /* Gallery */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 160px 160px;
+    gap: 12px;
+  }
+  .gallery .g1 { grid-column: span 2; grid-row: span 2; }
+  .gallery img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; display: block; }
+  @media (max-width: 700px) {
+    .gallery { grid-template-columns: repeat(2, 1fr); grid-template-rows: 120px 120px 120px; }
+    .gallery .g1 { grid-column: span 2; grid-row: span 1; height: 200px; }
+  }
+
+  /* About */
+  .about { display: flex; flex-wrap: wrap; gap: 50px; align-items: center; background: var(--bg); border-radius: 24px; }
+  .about-img { flex: 1; min-width: 280px; }
+  .about-img img { width: 100%; border-radius: 18px; display: block; }
+  .about-text { flex: 1; min-width: 280px; }
+  .about-text h2 { font-size: 2rem; margin-bottom: 16px; }
+  .about-text p { color: var(--muted); margin-bottom: 20px; }
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .checklist li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .checklist li .icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .checklist li .icon-wrap .icon { width: 14px; height: 14px; }
+
+  /* Testimonials */
+  .testimonials { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+  .testimonial-card {
+    background: var(--light);
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .testimonial-card .stars { color: #f59e0b; margin-bottom: 10px; font-size: 1.1rem; }
+  .testimonial-card p { color: var(--dark); font-size: .95rem; margin-bottom: 14px; }
+  .testimonial-card .who { font-weight: 700; font-size: .9rem; color: var(--muted); }
+
+  /* Map + contact */
+  .contact-section {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 24px;
+    color: #fff;
+    overflow: hidden;
+  }
+  .contact-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 0; }
+  @media (max-width: 800px) { .contact-grid { grid-template-columns: 1fr; } }
+  .contact-info-panel { padding: 50px; }
+  .contact-info-panel h2 { font-size: 2rem; margin-bottom: 10px; }
+  .contact-info-panel p.lead { opacity: .9; margin-bottom: 30px; }
+  .contact-rows { display: flex; flex-direction: column; gap: 18px; margin-bottom: 30px; }
+  .contact-row { display: flex; gap: 14px; align-items: flex-start; }
+  .contact-row .icon { display: flex; align-items: center; }
+  .contact-row .txt strong { display: block; }
+  .contact-row .txt span { opacity: .85; font-size: .92rem; }
+  .map-panel iframe { width: 100%; height: 100%; min-height: 360px; border: 0; display: block; }
+
+  /* CTA banner */
+  .cta-banner {
+    text-align: center;
+    background: var(--bg);
+    border-radius: 24px;
+    padding: 60px 20px;
+  }
+  .cta-banner h2 { font-size: 2rem; margin-bottom: 14px; }
+  .cta-banner p { color: var(--muted); margin-bottom: 28px; }
+
+  footer {
+    background: var(--dark);
+    color: #d1d5db;
+    text-align: center;
+    padding: 36px 20px;
+    font-size: .9rem;
+  }
+  footer .foot-brand { font-weight: 800; color: #fff; margin-bottom: 6px; font-size: 1.1rem; }
+
+  /* Floating WhatsApp */
+  .whatsapp-float {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #25D366;
+    color: #fff;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(0,0,0,.3);
+    z-index: 998;
+    animation: pulse 2.4s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(37,211,102,.55); }
+    70% { box-shadow: 0 0 0 14px rgba(37,211,102,0); }
+    100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
+  }
+  .icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+
+  /* Scroll-reveal animations */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-stagger > * { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal-stagger.visible > * { opacity: 1; transform: translateY(0); }
+  .reveal-stagger.visible > *:nth-child(1) { transition-delay: .05s; }
+  .reveal-stagger.visible > *:nth-child(2) { transition-delay: .15s; }
+  .reveal-stagger.visible > *:nth-child(3) { transition-delay: .25s; }
+  .reveal-stagger.visible > *:nth-child(4) { transition-delay: .35s; }
+  .reveal-stagger.visible > *:nth-child(5) { transition-delay: .45s; }
+
+  /* Hero entrance */
+  .hero-content > * { opacity: 0; transform: translateY(20px); animation: heroIn .8s ease forwards; }
+  .hero-content .eyebrow { animation-delay: .05s; }
+  .hero-content h1 { animation-delay: .15s; }
+  .hero-content p { animation-delay: .25s; }
+  .hero-content .hero-actions { animation-delay: .35s; }
+  @keyframes heroIn { to { opacity: 1; transform: translateY(0); } }
+  .hero { animation: heroZoom 12s ease-out forwards; }
+  @keyframes heroZoom { from { background-size: 112%; } to { background-size: 100%; } }
+
+  .demo-badge {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    background: #fbbf24;
+    color: #1f2937;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: .85rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0,0,0,.25);
+    z-index: 999;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+</style>
+</head>
+<body>
+
+
+
+<div class="navbar">
+  <div class="brand">Haoyunlai Massage Spa</div>
+  <nav>
+    <a href="#servicios">Servicios</a>
+    <a href="#nosotros">Nosotros</a>
+    <a href="#galeria">Galeria</a>
+    <a href="#contacto">Contacto</a>
+    <a class="nav-cta" href="https://wa.me/6892005125" target="_blank" rel="noreferrer"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> WhatsApp</a>
+  </nav>
+</div>
+
+<header class="hero">
+  <div class="hero-content">
+    <span class="eyebrow">spa · orlando</span>
+    <h1>Haoyunlai Massage Spa</h1>
+    <p>Atencion profesional y de confianza en orlando.</p>
+    <div class="hero-actions">
+      <a class="btn" href="https://wa.me/6892005125" target="_blank" rel="noreferrer"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> Escribenos por WhatsApp</a>
+      <a class="btn-outline" href="tel:(689) 200-5125"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Llamar ahora</a>
+    </div>
+  </div>
+</header>
+
+
+<div class="stats-bar reveal-stagger reveal">
+  
+  <div class="stat"><div class="num"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <span data-count="3.8">0</span></div><div class="label">Calificacion en Google</div></div>
+  
+  
+  <div class="stat"><div class="num" data-count="26" data-suffix="+">0</div><div class="label">Clientes satisfechos</div></div>
+  
+  <div class="stat"><div class="num" data-count="100" data-suffix="%">0</div><div class="label">Servicio garantizado</div></div>
+  <div class="stat"><div class="num">24/7</div><div class="label">Atencion por WhatsApp</div></div>
+</div>
+
+
+<section id="servicios">
+  <span class="section-tag reveal">Lo que ofrecemos</span>
+  <h2 class="section-title reveal">Nuestros servicios</h2>
+  <p class="section-subtitle reveal">Soluciones pensadas para spa en orlando, con la calidad y confianza que tu negocio merece.</p>
+  <div class="services reveal-stagger reveal">
+    
+    <div class="service-card">
+      <div class="img" style="background-image: url('https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?w=600&amp;q=75&amp;auto=format&amp;fit=crop')"></div>
+      <div class="body">
+        <div class="icon-wrap"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></div>
+        <h3>Cortes y estilos</h3>
+        <p>Tendencias y servicios personalizados.</p>
+      </div>
+    </div>
+    
+    <div class="service-card">
+      <div class="img" style="background-image: url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&amp;q=75&amp;auto=format&amp;fit=crop')"></div>
+      <div class="body">
+        <div class="icon-wrap"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div>
+        <h3>Tratamientos</h3>
+        <p>Cuidado profesional para ti.</p>
+      </div>
+    </div>
+    
+    <div class="service-card">
+      <div class="img" style="background-image: url('https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&amp;q=75&amp;auto=format&amp;fit=crop')"></div>
+      <div class="body">
+        <div class="icon-wrap"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
+        <h3>Paquetes y promociones</h3>
+        <p>Combina servicios y ahorra.</p>
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+<section id="galeria">
+  <span class="section-tag reveal">Nuestro espacio</span>
+  <h2 class="section-title reveal">Galeria</h2>
+  <p class="section-subtitle reveal">Un vistazo a nuestro trabajo y nuestras instalaciones.</p>
+  <div class="gallery reveal-stagger reveal">
+    <div class="g1"><img src="https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?w=900&amp;q=75&amp;auto=format&amp;fit=crop" alt="Haoyunlai Massage Spa" loading="lazy" decoding="async" /></div>
+    <div class="g2"><img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Haoyunlai Massage Spa" loading="lazy" decoding="async" /></div>
+    <div class="g3"><img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Haoyunlai Massage Spa" loading="lazy" decoding="async" /></div>
+    <div class="g4"><img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Haoyunlai Massage Spa" loading="lazy" decoding="async" /></div>
+    <div class="g5"><img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Haoyunlai Massage Spa" loading="lazy" decoding="async" /></div>
+  </div>
+</section>
+
+<section id="nosotros">
+  <div class="about reveal">
+    <div class="about-img">
+      <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=900&amp;q=75&amp;auto=format&amp;fit=crop" alt="Haoyunlai Massage Spa" loading="lazy" decoding="async" />
+    </div>
+    <div class="about-text">
+      <span class="section-tag" style="text-align:left">Sobre nosotros</span>
+      <h2>Comprometidos con orlando</h2>
+      <p>Haoyunlai Massage Spa es un negocio local de spa en orlando comprometido con ofrecer un servicio de calidad a cada uno de nuestros clientes. Contactanos hoy mismo para mas informacion.</p>
+      <ul class="checklist">
+        
+        <li><span class="icon-wrap"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>Productos de alta calidad</li>
+        
+        <li><span class="icon-wrap"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>Ambiente relajante y limpio</li>
+        
+        <li><span class="icon-wrap"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>Promociones para nuevos clientes</li>
+        
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="contacto">
+  <div class="contact-section reveal">
+    <div class="contact-grid">
+      <div class="contact-info-panel">
+        <span class="section-tag" style="text-align:left; color: rgba(255,255,255,.8)">Contactanos</span>
+        <h2>Hablemos de tu proyecto</h2>
+        <p class="lead">Escribenos hoy mismo y recibe atencion personalizada.</p>
+        <div class="contact-rows">
+          <div class="contact-row">
+            <div class="icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <div class="txt"><strong>Direccion</strong><span>734 W Colonial Dr, Orlando, FL 32804, USA</span></div>
+          </div>
+          
+          <div class="contact-row">
+            <div class="icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+            <div class="txt"><strong>Telefono</strong><span>(689) 200-5125</span></div>
+          </div>
+          
+          
+          <div class="contact-row">
+            <div class="icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="txt"><strong>Horario</strong><span>Lunes a Sabado, 8:00am - 6:00pm</span></div>
+          </div>
+        </div>
+        <a class="btn" href="https://wa.me/6892005125" target="_blank" rel="noreferrer">Solicitar informacion por WhatsApp</a>
+      </div>
+      <div class="map-panel">
+        <iframe src="https://maps.google.com/maps?q=28.552845,-81.3903381&amp;z=15&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="cta-banner reveal">
+    <h2>¿Listo para trabajar con nosotros?</h2>
+    <p>Contactanos ahora y recibe atencion inmediata.</p>
+    <a class="btn btn-primary" href="https://wa.me/6892005125" target="_blank" rel="noreferrer">Escribir por WhatsApp</a>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-brand">Haoyunlai Massage Spa</div>
+  <p>Spa · 734 W Colonial Dr, Orlando, FL 32804, USA</p>
+  <p style="margin-top: 10px;">&copy; 2026 Haoyunlai Massage Spa. Todos los derechos reservados.</p>
+</footer>
+
+<a class="whatsapp-float" href="https://wa.me/6892005125" target="_blank" rel="noreferrer" title="Escribenos por WhatsApp"><svg class="icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></a>
+<div class="demo-badge"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> DEMO — Sitio de muestra</div>
+
+<script>
+  var revealEls = document.querySelectorAll('.reveal');
+  var counters = document.querySelectorAll('[data-count]');
+
+  function animateCounter(el) {
+    var target = parseFloat(el.getAttribute('data-count'));
+    var suffix = el.getAttribute('data-suffix') || '';
+    var isInt = target % 1 === 0;
+    var duration = 1000;
+    var start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      var progress = Math.min((ts - start) / duration, 1);
+      var val = target * progress;
+      el.textContent = (isInt ? Math.floor(val) : val.toFixed(1)) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          entry.target.querySelectorAll('[data-count]').forEach(animateCounter);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(function (el) { observer.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add('visible'); });
+    counters.forEach(animateCounter);
+  }
+</script>
+
+</body>
+</html>
