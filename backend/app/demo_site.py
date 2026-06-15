@@ -3,6 +3,10 @@
 Crea un index.html autocontenido (una sola pagina) a partir de una plantilla
 Jinja2 y los datos del lead, y lo escribe en docs/demos/<slug>/index.html en
 la raiz del repo para que pueda publicarse via GitHub Pages.
+
+Las imagenes, colores y textos se eligen segun el NICHO especifico del lead
+(con fallback a la categoria y luego a un set generico), para que la demo se
+vea relevante al tipo de negocio.
 """
 
 import re
@@ -18,162 +22,283 @@ DEMOS_DIR = REPO_ROOT / "docs" / "demos"
 
 _env = Environment(loader=FileSystemLoader(str(APP_DIR)), autoescape=True)
 
-# Imagenes de Unsplash Source (sin necesidad de API key) por categoria.
-# Cada categoria tiene: hero, about, gallery (5 imagenes) y una imagen por servicio.
-CATEGORY_CONTENT = {
+
+def _img(photo_id: str, w: int = 600) -> str:
+    return f"https://images.unsplash.com/photo-{photo_id}?w={w}&q=75&auto=format&fit=crop"
+
+
+# Banco de fotos verificadas (Unsplash), agrupadas por tema visual.
+THEMES = {
+    "dental1": "1629909613654-28e377c37b09",
+    "dental2": "1606811841689-23dfddce3e95",
+    "dental3": "1588776814546-1ffcf47267a5",
+    "doctor1": "1559757148-5c350d0d3c56",
+    "doctor2": "1576091160550-2173dba999ef",
+    "doctor3": "1581595219315-a187dd40c322",
+    "office1": "1450101499163-c8848c66ca85",
+    "office2": "1556157382-97eda2d62296",
+    "lawbooks": "1521791136064-7986c2920216",
+    "lawyer_hero": "1521587760476-6c12a4b040da",
+    "handshake": "1431540015161-0bf868a2d407",
+    "salon1": "1562322140-8baeececf3df",
+    "nails": "1487412947147-5cebf100ffc2",
+    "barber": "1560066984-138dadb4c035",
+    "spa1": "1633681926022-84c23e8cb2d6",
+    "spa2": "1540555700478-4be289fbecef",
+    "beauty_hero": "1521590832167-7bcbfaa6381f",
+    "house1": "1560518883-ce09059eeffa",
+    "livingroom": "1564013799919-ab600027ffc6",
+    "kitchen": "1582268611958-ebfd161ef9cf",
+    "house2": "1560185007-cde436f6a4d0",
+    "house3": "1576941089067-2de3c901e126",
+    "house4": "1599809275671-b5942cabc7a2",
+    "house5": "1503387762-592deb58ef4e",
+    "construction_hero": "1581578731548-c64695cc6952",
+    "tools": "1504148455328-c376907d081c",
+    "plumber": "1581092918056-0c4c3acd3789",
+    "renovation": "1581092580497-e0d23cbdf1dc",
+    "cleaning1": "1600618528240-fb9fc964b853",
+    "cleaning2": "1572981779307-38b8cabb2407",
+    "garage_hero": "1486262715619-67b85e0b08d3",
+    "garage1": "1503376780353-7e6692767b70",
+    "mechanic1": "1487754180451-c456f719a1fc",
+    "mechanic2": "1493238792000-8113da705763",
+    "tires": "1517524008697-84bbe3c3fd98",
+    "car_interior": "1518987048-93e29699e79a",
+    "finance_hero": "1454165804606-c3d57bc86b40",
+    "accounting": "1554224155-6726b3ff858f",
+    "meeting": "1551288049-bebda4e38f71",
+    "calculator": "1556742049-0cfed4f6a45d",
+    "gym1": "1534438327276-14e5300c3a48",
+    "gym2": "1517836357463-d25dfeac3438",
+    "yoga1": "1571019613454-1cb2f99b2d8b",
+    "restaurant1": "1517248135467-4c7edcad34c4",
+    "food1": "1414235077428-338989a2e8c0",
+    "bakery1": "1555396273-367ea4eb4db5",
+    "bakery2": "1556910103-1c02745aae4d",
+    "wedding1": "1511795409834-ef04bbd61622",
+    "wedding2": "1519741497674-611481863552",
+    "classroom1": "1503676260728-1c00da094a0b",
+    "daycare1": "1503454537195-1dcabb73ffb9",
+    "market1": "1556740758-90de374c12ad",
+    "veterinary1": "1542838132-92c53300491e",
+    "veterinary2": "1601758228041-f3b2795255f1",
+    "pestcontrol1": "1532938911079-1b06ac7ceec7",
+    "moving1": "1600880292203-757bb62b4baf",
+    "painter1": "1558618666-fcd25c85cd64",
+    "flooring1": "1610465299996-30f240ac2b1c",
+    "fence1": "1601581875309-fafbf2d3ed3a",
+    "ac1": "1605152276897-4f618f831968",
+}
+
+
+def _set(hero, about, gallery, services):
+    return {"hero": hero, "about": about, "gallery": gallery, "services": services}
+
+
+# Set de imagenes por nicho especifico (se intenta primero).
+NICHE_IMAGES = {
+    "dentista": _set("dental1", "dental2", ["dental3", "doctor1", "office2", "doctor2", "dental1"], ["dental2", "doctor3", "dental3"]),
+    "ortodoncista": _set("dental2", "dental1", ["dental3", "dental1", "office2", "doctor2", "dental2"], ["dental1", "dental3", "doctor3"]),
+    "clinica medica": _set("doctor2", "doctor1", ["doctor3", "dental1", "office2", "meeting", "doctor2"], ["doctor1", "doctor3", "office2"]),
+    "dermatologo": _set("doctor2", "spa1", ["spa2", "doctor3", "office2", "doctor1", "spa1"], ["spa1", "doctor3", "spa2"]),
+    "quiropractico": _set("doctor3", "gym1", ["doctor1", "gym1", "office2", "doctor2", "gym2"], ["doctor1", "gym1", "doctor3"]),
+    "fisioterapia": _set("gym1", "doctor3", ["gym2", "doctor1", "office2", "doctor3", "gym1"], ["gym1", "doctor3", "gym2"]),
+    "veterinaria": _set("veterinary1", "veterinary2", ["veterinary1", "veterinary2", "doctor1", "doctor3", "office2"], ["veterinary1", "veterinary2", "doctor1"]),
+    "medspa": _set("spa1", "spa2", ["spa1", "spa2", "beauty_hero", "salon1", "nails"], ["spa1", "spa2", "beauty_hero"]),
+    "psicologo": _set("office2", "meeting", ["office2", "meeting", "doctor3", "office1", "doctor1"], ["meeting", "office2", "doctor3"]),
+
+    "abogado": _set("lawyer_hero", "lawbooks", ["office1", "handshake", "lawbooks", "office2", "meeting"], ["lawbooks", "handshake", "office1"]),
+    "abogado de inmigracion": _set("lawyer_hero", "handshake", ["office1", "handshake", "lawbooks", "office2", "meeting"], ["handshake", "lawbooks", "office1"]),
+    "abogado de accidentes": _set("lawyer_hero", "lawbooks", ["office1", "handshake", "lawbooks", "office2", "meeting"], ["lawbooks", "handshake", "office1"]),
+    "abogado de familia": _set("lawyer_hero", "handshake", ["office1", "handshake", "lawbooks", "office2", "meeting"], ["handshake", "lawbooks", "office1"]),
+    "abogado de bancarrota": _set("lawyer_hero", "lawbooks", ["office1", "handshake", "lawbooks", "office2", "meeting"], ["lawbooks", "handshake", "office1"]),
+    "notaria": _set("office1", "handshake", ["office1", "handshake", "lawbooks", "office2", "meeting"], ["handshake", "office1", "lawbooks"]),
+
+    "salon de belleza": _set("beauty_hero", "salon1", ["salon1", "nails", "barber", "beauty_hero", "spa1"], ["salon1", "nails", "spa1"]),
+    "barberia": _set("barber", "salon1", ["barber", "salon1", "nails", "beauty_hero", "spa1"], ["barber", "salon1", "nails"]),
+    "estudio de unas": _set("nails", "beauty_hero", ["nails", "salon1", "beauty_hero", "spa1", "spa2"], ["nails", "spa1", "salon1"]),
+    "spa": _set("spa1", "spa2", ["spa1", "spa2", "beauty_hero", "salon1", "nails"], ["spa1", "spa2", "beauty_hero"]),
+
+    "bienes raices": _set("house1", "livingroom", ["house1", "livingroom", "kitchen", "house2", "house3"], ["house1", "kitchen", "livingroom"]),
+    "administracion de propiedades": _set("house2", "kitchen", ["house2", "house3", "house4", "house5", "livingroom"], ["house2", "kitchen", "house3"]),
+
+    "contratista general": _set("construction_hero", "renovation", ["construction_hero", "renovation", "tools", "house3", "house4"], ["renovation", "tools", "construction_hero"]),
+    "remodelacion": _set("renovation", "construction_hero", ["renovation", "construction_hero", "tools", "kitchen", "house4"], ["renovation", "kitchen", "tools"]),
+    "techos": _set("construction_hero", "house2", ["construction_hero", "house2", "tools", "house3", "renovation"], ["construction_hero", "tools", "house2"]),
+    "plomero": _set("plumber", "tools", ["plumber", "tools", "construction_hero", "house3", "renovation"], ["plumber", "tools", "renovation"]),
+    "electricista": _set("tools", "construction_hero", ["tools", "construction_hero", "house3", "renovation", "house4"], ["tools", "construction_hero", "renovation"]),
+    "aire acondicionado": _set("ac1", "tools", ["ac1", "construction_hero", "tools", "house3", "renovation"], ["ac1", "tools", "construction_hero"]),
+    "paisajismo": _set("house5", "house3", ["house5", "house3", "house1", "house4", "construction_hero"], ["house5", "house3", "house1"]),
+    "pintor": _set("painter1", "renovation", ["painter1", "renovation", "house3", "tools", "construction_hero"], ["painter1", "renovation", "house3"]),
+    "pisos": _set("flooring1", "livingroom", ["flooring1", "livingroom", "renovation", "house3", "tools"], ["flooring1", "livingroom", "renovation"]),
+    "cercas": _set("fence1", "house5", ["fence1", "house5", "construction_hero", "tools", "house3"], ["fence1", "house5", "construction_hero"]),
+    "control de plagas": _set("pestcontrol1", "house2", ["pestcontrol1", "house2", "house3", "cleaning2", "tools"], ["pestcontrol1", "house2", "cleaning2"]),
+    "mudanzas": _set("moving1", "house4", ["moving1", "house4", "house3", "tools", "house5"], ["moving1", "house4", "tools"]),
+    "limpieza": _set("cleaning1", "cleaning2", ["cleaning1", "cleaning2", "livingroom", "kitchen", "house3"], ["cleaning1", "cleaning2", "kitchen"]),
+
+    "taller mecanico": _set("garage_hero", "mechanic1", ["garage_hero", "mechanic1", "mechanic2", "tires", "car_interior"], ["mechanic1", "mechanic2", "tires"]),
+    "detailing de autos": _set("car_interior", "garage1", ["car_interior", "garage1", "mechanic1", "tires", "garage_hero"], ["car_interior", "garage1", "tires"]),
+    "taller de hojalateria": _set("garage1", "mechanic2", ["garage1", "mechanic2", "garage_hero", "tires", "car_interior"], ["mechanic2", "garage1", "tires"]),
+
+    "contador": _set("finance_hero", "accounting", ["finance_hero", "accounting", "calculator", "meeting", "office1"], ["accounting", "calculator", "meeting"]),
+    "preparacion de impuestos": _set("calculator", "accounting", ["finance_hero", "accounting", "calculator", "meeting", "office1"], ["calculator", "accounting", "meeting"]),
+    "asesor financiero": _set("finance_hero", "meeting", ["finance_hero", "accounting", "calculator", "meeting", "office1"], ["meeting", "finance_hero", "accounting"]),
+    "agente de seguros": _set("meeting", "handshake", ["finance_hero", "meeting", "handshake", "office1", "accounting"], ["meeting", "handshake", "accounting"]),
+
+    "gimnasio": _set("gym1", "gym2", ["gym1", "gym2", "yoga1", "gym2", "gym1"], ["gym1", "gym2", "yoga1"]),
+    "yoga": _set("yoga1", "gym2", ["yoga1", "gym1", "gym2", "spa1", "spa2"], ["yoga1", "gym2", "spa1"]),
+    "entrenador personal": _set("gym2", "gym1", ["gym2", "gym1", "yoga1", "office2", "meeting"], ["gym2", "gym1", "yoga1"]),
+
+    "fotografo": _set("wedding1", "wedding2", ["wedding1", "wedding2", "office2", "beauty_hero", "salon1"], ["wedding1", "wedding2", "beauty_hero"]),
+    "planificador de bodas": _set("wedding2", "wedding1", ["wedding2", "wedding1", "restaurant1", "food1", "bakery1"], ["wedding1", "wedding2", "restaurant1"]),
+    "salon de eventos": _set("wedding1", "restaurant1", ["wedding1", "restaurant1", "wedding2", "bakery1", "food1"], ["wedding1", "restaurant1", "wedding2"]),
+    "catering": _set("food1", "bakery1", ["food1", "bakery1", "bakery2", "restaurant1", "wedding1"], ["food1", "bakery1", "restaurant1"]),
+
+    "academia": _set("classroom1", "daycare1", ["classroom1", "daycare1", "office2", "meeting", "office1"], ["classroom1", "daycare1", "meeting"]),
+    "guarderia": _set("daycare1", "classroom1", ["daycare1", "classroom1", "office2", "meeting", "office1"], ["daycare1", "classroom1", "meeting"]),
+    "clases particulares": _set("classroom1", "office2", ["classroom1", "daycare1", "office2", "meeting", "office1"], ["classroom1", "meeting", "office2"]),
+
+    "envios de dinero": _set("market1", "finance_hero", ["market1", "finance_hero", "accounting", "office1", "meeting"], ["finance_hero", "accounting", "meeting"]),
+    "restaurante": _set("restaurant1", "food1", ["restaurant1", "food1", "bakery1", "bakery2", "market1"], ["food1", "bakery1", "restaurant1"]),
+    "panaderia": _set("bakery1", "bakery2", ["bakery1", "bakery2", "food1", "restaurant1", "market1"], ["bakery1", "bakery2", "food1"]),
+    "mercado latino": _set("market1", "food1", ["market1", "food1", "bakery1", "restaurant1", "bakery2"], ["market1", "food1", "bakery1"]),
+}
+
+# Textos (servicios + highlights) por categoria, usados cuando el nicho no
+# tiene un set propio o como base para los titulos/descripciones.
+CATEGORY_TEXT = {
     "Legal": {
-        "hero": "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1600&q=80",
-        "about": "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=900&q=80",
-        "gallery": [
-            "https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=900&q=80",
-            "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=600&q=80",
-            "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80",
-            "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80",
-            "https://images.unsplash.com/photo-1423592707957-3b212afa6733?w=600&q=80",
-        ],
         "services": [
-            {"icon": "⚖️", "title": "Consultas legales", "description": "Asesoria personalizada para tu caso.", "image": "https://images.unsplash.com/photo-1593115057322-e94b77572f20?w=600&q=80"},
-            {"icon": "📄", "title": "Tramites y documentos", "description": "Preparacion y revision de documentos legales.", "image": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80"},
-            {"icon": "🤝", "title": "Representacion", "description": "Te acompañamos en todo el proceso.", "image": "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80"},
+            {"icon": "⚖️", "title": "Consultas legales", "description": "Asesoria personalizada para tu caso."},
+            {"icon": "📄", "title": "Tramites y documentos", "description": "Preparacion y revision de documentos legales."},
+            {"icon": "🤝", "title": "Representacion", "description": "Te acompañamos en todo el proceso."},
         ],
         "highlights": ["Mas de 10 años de experiencia", "Consulta inicial sin costo", "Atencion en español e ingles"],
     },
     "Salud": {
-        "hero": "https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1600&q=80",
-        "about": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=900&q=80",
-        "gallery": [
-            "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=900&q=80",
-            "https://images.unsplash.com/photo-1581595219315-a187dd40c322?w=600&q=80",
-            "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=600&q=80",
-            "https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?w=600&q=80",
-            "https://images.unsplash.com/photo-1551076805-e1869033e561?w=600&q=80",
-        ],
         "services": [
-            {"icon": "🩺", "title": "Consultas y diagnostico", "description": "Atencion profesional y personalizada.", "image": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=80"},
-            {"icon": "📅", "title": "Citas flexibles", "description": "Horarios que se adaptan a tu rutina.", "image": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=80"},
-            {"icon": "💳", "title": "Planes de pago", "description": "Opciones de financiamiento disponibles.", "image": "https://images.unsplash.com/photo-1581056771107-24ca5f033842?w=600&q=80"},
+            {"icon": "🩺", "title": "Consultas y diagnostico", "description": "Atencion profesional y personalizada."},
+            {"icon": "📅", "title": "Citas flexibles", "description": "Horarios que se adaptan a tu rutina."},
+            {"icon": "💳", "title": "Planes de pago", "description": "Opciones de financiamiento disponibles."},
         ],
         "highlights": ["Equipos modernos y certificados", "Personal con amplia experiencia", "Aceptamos seguros y planes de pago"],
     },
     "Belleza": {
-        "hero": "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1600&q=80",
-        "about": "https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?w=900&q=80",
-        "gallery": [
-            "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=900&q=80",
-            "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80",
-            "https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=600&q=80",
-            "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&q=80",
-            "https://images.unsplash.com/photo-1519415510236-718bdfcd89c1?w=600&q=80",
-        ],
         "services": [
-            {"icon": "✂️", "title": "Cortes y estilos", "description": "Tendencias y servicios personalizados.", "image": "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80"},
-            {"icon": "💆", "title": "Tratamientos", "description": "Cuidado profesional para ti.", "image": "https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?w=600&q=80"},
-            {"icon": "🎁", "title": "Paquetes y promociones", "description": "Combina servicios y ahorra.", "image": "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&q=80"},
+            {"icon": "✂️", "title": "Cortes y estilos", "description": "Tendencias y servicios personalizados."},
+            {"icon": "💆", "title": "Tratamientos", "description": "Cuidado profesional para ti."},
+            {"icon": "🎁", "title": "Paquetes y promociones", "description": "Combina servicios y ahorra."},
         ],
         "highlights": ["Productos de alta calidad", "Ambiente relajante y limpio", "Promociones para nuevos clientes"],
     },
     "Bienes raices": {
-        "hero": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1600&q=80",
-        "about": "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=900&q=80",
-        "gallery": [
-            "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=900&q=80",
-            "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=600&q=80",
-            "https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=600&q=80",
-            "https://images.unsplash.com/photo-1599809275671-b5942cabc7a2?w=600&q=80",
-            "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80",
-        ],
         "services": [
-            {"icon": "🏠", "title": "Compra y venta", "description": "Te ayudamos a encontrar tu proxima propiedad.", "image": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80"},
-            {"icon": "📊", "title": "Avaluos", "description": "Conoce el valor real de tu propiedad.", "image": "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&q=80"},
-            {"icon": "🔑", "title": "Administracion", "description": "Gestion integral de propiedades en renta.", "image": "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=600&q=80"},
+            {"icon": "🏠", "title": "Compra y venta", "description": "Te ayudamos a encontrar tu proxima propiedad."},
+            {"icon": "📊", "title": "Avaluos", "description": "Conoce el valor real de tu propiedad."},
+            {"icon": "🔑", "title": "Administracion", "description": "Gestion integral de propiedades en renta."},
         ],
         "highlights": ["Asesoria personalizada en cada paso", "Amplia cartera de propiedades", "Negociacion profesional"],
     },
     "Hogar y construccion": {
-        "hero": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1600&q=80",
-        "about": "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=900&q=80",
-        "gallery": [
-            "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=900&q=80",
-            "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&q=80",
-            "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80",
-            "https://images.unsplash.com/photo-1556909212-d5b65c44e9bd?w=600&q=80",
-            "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=600&q=80",
-        ],
         "services": [
-            {"icon": "🔧", "title": "Reparaciones", "description": "Servicio rapido y garantizado.", "image": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&q=80"},
-            {"icon": "📋", "title": "Presupuestos gratis", "description": "Cotizacion sin costo, sin compromiso.", "image": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&q=80"},
-            {"icon": "🚐", "title": "Servicio a domicilio", "description": "Vamos a tu casa o negocio.", "image": "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=600&q=80"},
+            {"icon": "🔧", "title": "Reparaciones", "description": "Servicio rapido y garantizado."},
+            {"icon": "📋", "title": "Presupuestos gratis", "description": "Cotizacion sin costo, sin compromiso."},
+            {"icon": "🚐", "title": "Servicio a domicilio", "description": "Vamos a tu casa o negocio."},
         ],
         "highlights": ["Mano de obra garantizada", "Materiales de calidad", "Presupuesto claro desde el inicio"],
     },
     "Automotriz": {
-        "hero": "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=1600&q=80",
-        "about": "https://images.unsplash.com/photo-1493238792000-8113da705763?w=900&q=80",
-        "gallery": [
-            "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=900&q=80",
-            "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=600&q=80",
-            "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=600&q=80",
-            "https://images.unsplash.com/photo-1518987048-93e29699e79a?w=600&q=80",
-            "https://images.unsplash.com/photo-1632823469850-1b7b1e8b7af9?w=600&q=80",
-        ],
         "services": [
-            {"icon": "🚗", "title": "Diagnostico", "description": "Revision completa de tu vehiculo.", "image": "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=600&q=80"},
-            {"icon": "🔩", "title": "Reparaciones", "description": "Repuestos de calidad y mano de obra garantizada.", "image": "https://images.unsplash.com/photo-1493238792000-8113da705763?w=600&q=80"},
-            {"icon": "⏱️", "title": "Servicio rapido", "description": "Minimiza el tiempo sin tu vehiculo.", "image": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80"},
+            {"icon": "🚗", "title": "Diagnostico", "description": "Revision completa de tu vehiculo."},
+            {"icon": "🔩", "title": "Reparaciones", "description": "Repuestos de calidad y mano de obra garantizada."},
+            {"icon": "⏱️", "title": "Servicio rapido", "description": "Minimiza el tiempo sin tu vehiculo."},
         ],
         "highlights": ["Tecnicos certificados", "Diagnostico computarizado", "Garantia en reparaciones"],
     },
     "Finanzas": {
-        "hero": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1600&q=80",
-        "about": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=900&q=80",
-        "gallery": [
-            "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&q=80",
-            "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80",
-            "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80",
-            "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&q=80",
-            "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80",
-        ],
         "services": [
-            {"icon": "📈", "title": "Asesoria financiera", "description": "Planeacion personalizada para tu negocio o familia.", "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80"},
-            {"icon": "🧾", "title": "Impuestos", "description": "Declaraciones y cumplimiento al dia.", "image": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&q=80"},
-            {"icon": "📞", "title": "Consultas gratuitas", "description": "Primera consulta sin costo.", "image": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80"},
+            {"icon": "📈", "title": "Asesoria financiera", "description": "Planeacion personalizada para tu negocio o familia."},
+            {"icon": "🧾", "title": "Impuestos", "description": "Declaraciones y cumplimiento al dia."},
+            {"icon": "📞", "title": "Consultas gratuitas", "description": "Primera consulta sin costo."},
         ],
         "highlights": ["Atencion personalizada", "Confidencialidad garantizada", "Resultados comprobados"],
     },
+    "Fitness": {
+        "services": [
+            {"icon": "💪", "title": "Entrenamiento personalizado", "description": "Planes adaptados a tus objetivos."},
+            {"icon": "🧘", "title": "Clases grupales", "description": "Horarios variados para toda la familia."},
+            {"icon": "🥗", "title": "Asesoria nutricional", "description": "Acompañamiento integral para tus metas."},
+        ],
+        "highlights": ["Instructores certificados", "Instalaciones limpias y modernas", "Primera clase gratis"],
+    },
+    "Eventos": {
+        "services": [
+            {"icon": "🎉", "title": "Planeacion completa", "description": "Nos encargamos de cada detalle de tu evento."},
+            {"icon": "📸", "title": "Cobertura profesional", "description": "Capturamos cada momento especial."},
+            {"icon": "🍽️", "title": "Servicio personalizado", "description": "Opciones a tu medida para tu ocasion."},
+        ],
+        "highlights": ["Experiencia en eventos de toda escala", "Atencion cercana y profesional", "Paquetes flexibles"],
+    },
+    "Educacion": {
+        "services": [
+            {"icon": "📚", "title": "Programas personalizados", "description": "Adaptados al ritmo de cada estudiante."},
+            {"icon": "👩‍🏫", "title": "Profesores calificados", "description": "Equipo con experiencia comprobada."},
+            {"icon": "🕒", "title": "Horarios flexibles", "description": "Opciones para toda la familia."},
+        ],
+        "highlights": ["Ambiente seguro y acogedor", "Seguimiento cercano del progreso", "Inscripciones abiertas todo el año"],
+    },
+    "Comunidad hispana": {
+        "services": [
+            {"icon": "🛍️", "title": "Productos y servicios", "description": "Todo lo que necesitas en un solo lugar."},
+            {"icon": "💵", "title": "Atencion rapida", "description": "Te atendemos en español sin complicaciones."},
+            {"icon": "🤝", "title": "Confianza y cercania", "description": "Servicio honesto para nuestra comunidad."},
+        ],
+        "highlights": ["Atencion en español", "Precios justos", "Ubicacion accesible"],
+    },
 }
 
-DEFAULT_CONTENT = {
-    "hero": "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1600&q=80",
-    "about": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=80",
-    "gallery": [
-        "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=80",
-        "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80",
-        "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80",
-        "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=600&q=80",
-        "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=600&q=80",
-    ],
+DEFAULT_TEXT = {
     "services": [
-        {"icon": "⭐", "title": "Calidad garantizada", "description": "Trabajo profesional respaldado por nuestra experiencia.", "image": "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=600&q=80"},
-        {"icon": "📅", "title": "Atencion rapida", "description": "Respondemos a la brevedad para agendar tu servicio.", "image": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80"},
-        {"icon": "💬", "title": "Atencion personalizada", "description": "Te escuchamos para ofrecerte la mejor solucion.", "image": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80"},
+        {"icon": "⭐", "title": "Calidad garantizada", "description": "Trabajo profesional respaldado por nuestra experiencia."},
+        {"icon": "📅", "title": "Atencion rapida", "description": "Respondemos a la brevedad para agendar tu servicio."},
+        {"icon": "💬", "title": "Atencion personalizada", "description": "Te escuchamos para ofrecerte la mejor solucion."},
     ],
     "highlights": ["Atencion profesional y de confianza", "Precios justos y transparentes", "Clientes satisfechos en toda la zona"],
 }
 
-TESTIMONIAL_POOL = [
-    {"stars": 5, "name": "Maria G.", "text": "Excelente servicio, muy profesionales y atentos. Totalmente recomendados."},
-    {"stars": 5, "name": "Carlos R.", "text": "Rapidos, honestos y de gran calidad. Volvere a contactarlos sin duda."},
-    {"stars": 4, "name": "Ana P.", "text": "Buena atencion y resultados como esperaba. Gracias por su ayuda."},
-]
+DEFAULT_IMAGES = _set("office2", "meeting", ["office1", "meeting", "handshake", "office2", "lawbooks"], ["office1", "meeting", "handshake"])
 
-PRIMARY_COLORS = [
-    ("#2563eb", "#1d4ed8"),
-    ("#0d9488", "#0f766e"),
-    ("#7c3aed", "#6d28d9"),
-    ("#dc2626", "#b91c1c"),
-    ("#ea580c", "#c2410c"),
-    ("#0284c7", "#0369a1"),
-]
+# Categoria -> set de imagenes generico (fallback si el nicho no tiene set propio).
+CATEGORY_DEFAULT_IMAGES = {
+    "Legal": NICHE_IMAGES["abogado"],
+    "Salud": NICHE_IMAGES["clinica medica"],
+    "Belleza": NICHE_IMAGES["salon de belleza"],
+    "Bienes raices": NICHE_IMAGES["bienes raices"],
+    "Hogar y construccion": NICHE_IMAGES["contratista general"],
+    "Automotriz": NICHE_IMAGES["taller mecanico"],
+    "Finanzas": NICHE_IMAGES["contador"],
+    "Fitness": NICHE_IMAGES["gimnasio"],
+    "Eventos": NICHE_IMAGES["salon de eventos"],
+    "Educacion": NICHE_IMAGES["academia"],
+    "Comunidad hispana": NICHE_IMAGES["restaurante"],
+}
+
+# Paleta blanca y limpia, con un color de acento por categoria acorde al nicho.
+CATEGORY_COLORS = {
+    "Legal": ("#1e3a8a", "#1e293b"),
+    "Salud": ("#0d9488", "#0f766e"),
+    "Belleza": ("#db2777", "#9d174d"),
+    "Bienes raices": ("#059669", "#047857"),
+    "Hogar y construccion": ("#ea580c", "#c2410c"),
+    "Automotriz": ("#dc2626", "#991b1b"),
+    "Finanzas": ("#16a34a", "#15803d"),
+    "Fitness": ("#f97316", "#c2410c"),
+    "Eventos": ("#7c3aed", "#6d28d9"),
+    "Educacion": ("#2563eb", "#1d4ed8"),
+    "Comunidad hispana": ("#f59e0b", "#b45309"),
+}
+DEFAULT_COLOR = ("#2563eb", "#1d4ed8")
 
 
 def slugify(text: str) -> str:
@@ -184,9 +309,16 @@ def slugify(text: str) -> str:
 
 
 def build_demo_html(lead, category: str = "") -> str:
-    content = CATEGORY_CONTENT.get(category, DEFAULT_CONTENT)
-    color_seed = sum(ord(c) for c in lead.business_name) if lead.business_name else 0
-    primary_color, primary_color_dark = PRIMARY_COLORS[color_seed % len(PRIMARY_COLORS)]
+    niche_value = (lead.niche or "").strip().lower()
+    images = NICHE_IMAGES.get(niche_value) or CATEGORY_DEFAULT_IMAGES.get(category) or DEFAULT_IMAGES
+    text = CATEGORY_TEXT.get(category, DEFAULT_TEXT)
+    primary_color, primary_color_dark = CATEGORY_COLORS.get(category, DEFAULT_COLOR)
+
+    services = [
+        {**svc, "image": _img(THEMES[images["services"][i]])}
+        for i, svc in enumerate(text["services"])
+    ]
+    gallery = [_img(THEMES[name], w=900 if i == 0 else 600) for i, name in enumerate(images["gallery"])]
 
     city = lead.city or ""
     tagline = (
@@ -219,12 +351,11 @@ def build_demo_html(lead, category: str = "") -> str:
         reviews_count=lead.reviews_count,
         tagline=tagline,
         about_text=about_text,
-        highlights=content["highlights"],
-        services=content["services"],
-        hero_image=content["hero"],
-        about_image=content["about"],
-        gallery=content["gallery"],
-        testimonials=TESTIMONIAL_POOL,
+        highlights=text["highlights"],
+        services=services,
+        hero_image=_img(THEMES[images["hero"]], w=1600),
+        about_image=_img(THEMES[images["about"]], w=900),
+        gallery=gallery,
         map_embed_url=map_embed_url,
         primary_color=primary_color,
         primary_color_dark=primary_color_dark,

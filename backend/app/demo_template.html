@@ -242,6 +242,27 @@
     70% { box-shadow: 0 0 0 14px rgba(37,211,102,0); }
     100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
   }
+  /* Scroll-reveal animations */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-stagger > * { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal-stagger.visible > * { opacity: 1; transform: translateY(0); }
+  .reveal-stagger.visible > *:nth-child(1) { transition-delay: .05s; }
+  .reveal-stagger.visible > *:nth-child(2) { transition-delay: .15s; }
+  .reveal-stagger.visible > *:nth-child(3) { transition-delay: .25s; }
+  .reveal-stagger.visible > *:nth-child(4) { transition-delay: .35s; }
+  .reveal-stagger.visible > *:nth-child(5) { transition-delay: .45s; }
+
+  /* Hero entrance */
+  .hero-content > * { opacity: 0; transform: translateY(20px); animation: heroIn .8s ease forwards; }
+  .hero-content .eyebrow { animation-delay: .05s; }
+  .hero-content h1 { animation-delay: .15s; }
+  .hero-content p { animation-delay: .25s; }
+  .hero-content .hero-actions { animation-delay: .35s; }
+  @keyframes heroIn { to { opacity: 1; transform: translateY(0); } }
+  .hero { animation: heroZoom 12s ease-out forwards; }
+  @keyframes heroZoom { from { background-size: 112%; } to { background-size: 100%; } }
+
   .demo-badge {
     position: fixed;
     bottom: 24px;
@@ -283,23 +304,23 @@
 </header>
 
 {% if rating or reviews_count %}
-<div class="stats-bar">
+<div class="stats-bar reveal-stagger reveal">
   {% if rating %}
-  <div class="stat"><div class="num">{{ rating }}⭐</div><div class="label">Calificacion en Google</div></div>
+  <div class="stat"><div class="num" data-count="{{ rating }}" data-suffix="⭐">0</div><div class="label">Calificacion en Google</div></div>
   {% endif %}
   {% if reviews_count %}
-  <div class="stat"><div class="num">{{ reviews_count }}+</div><div class="label">Clientes satisfechos</div></div>
+  <div class="stat"><div class="num" data-count="{{ reviews_count }}" data-suffix="+">0</div><div class="label">Clientes satisfechos</div></div>
   {% endif %}
-  <div class="stat"><div class="num">100%</div><div class="label">Servicio garantizado</div></div>
+  <div class="stat"><div class="num" data-count="100" data-suffix="%">0</div><div class="label">Servicio garantizado</div></div>
   <div class="stat"><div class="num">24/7</div><div class="label">Atencion por WhatsApp</div></div>
 </div>
 {% endif %}
 
 <section id="servicios">
-  <span class="section-tag">Lo que ofrecemos</span>
-  <h2 class="section-title">Nuestros servicios</h2>
-  <p class="section-subtitle">Soluciones pensadas para {{ niche }} en {{ city }}, con la calidad y confianza que tu negocio merece.</p>
-  <div class="services">
+  <span class="section-tag reveal">Lo que ofrecemos</span>
+  <h2 class="section-title reveal">Nuestros servicios</h2>
+  <p class="section-subtitle reveal">Soluciones pensadas para {{ niche }} en {{ city }}, con la calidad y confianza que tu negocio merece.</p>
+  <div class="services reveal-stagger reveal">
     {% for service in services %}
     <div class="service-card">
       <div class="img" style="background-image: url('{{ service.image }}')"></div>
@@ -314,22 +335,22 @@
 </section>
 
 <section id="galeria">
-  <span class="section-tag">Nuestro espacio</span>
-  <h2 class="section-title">Galeria</h2>
-  <p class="section-subtitle">Un vistazo a nuestro trabajo y nuestras instalaciones.</p>
-  <div class="gallery">
-    <div class="g1"><img src="{{ gallery[0] }}" alt="{{ business_name }}" loading="lazy" /></div>
-    <div class="g2"><img src="{{ gallery[1] }}" alt="{{ business_name }}" loading="lazy" /></div>
-    <div class="g3"><img src="{{ gallery[2] }}" alt="{{ business_name }}" loading="lazy" /></div>
-    <div class="g4"><img src="{{ gallery[3] }}" alt="{{ business_name }}" loading="lazy" /></div>
-    <div class="g5"><img src="{{ gallery[4] }}" alt="{{ business_name }}" loading="lazy" /></div>
+  <span class="section-tag reveal">Nuestro espacio</span>
+  <h2 class="section-title reveal">Galeria</h2>
+  <p class="section-subtitle reveal">Un vistazo a nuestro trabajo y nuestras instalaciones.</p>
+  <div class="gallery reveal-stagger reveal">
+    <div class="g1"><img src="{{ gallery[0] }}" alt="{{ business_name }}" loading="lazy" decoding="async" /></div>
+    <div class="g2"><img src="{{ gallery[1] }}" alt="{{ business_name }}" loading="lazy" decoding="async" /></div>
+    <div class="g3"><img src="{{ gallery[2] }}" alt="{{ business_name }}" loading="lazy" decoding="async" /></div>
+    <div class="g4"><img src="{{ gallery[3] }}" alt="{{ business_name }}" loading="lazy" decoding="async" /></div>
+    <div class="g5"><img src="{{ gallery[4] }}" alt="{{ business_name }}" loading="lazy" decoding="async" /></div>
   </div>
 </section>
 
 <section id="nosotros">
-  <div class="about">
+  <div class="about reveal">
     <div class="about-img">
-      <img src="{{ about_image }}" alt="{{ business_name }}" loading="lazy" />
+      <img src="{{ about_image }}" alt="{{ business_name }}" loading="lazy" decoding="async" />
     </div>
     <div class="about-text">
       <span class="section-tag" style="text-align:left">Sobre nosotros</span>
@@ -344,22 +365,8 @@
   </div>
 </section>
 
-<section>
-  <span class="section-tag">Lo que dicen de nosotros</span>
-  <h2 class="section-title">Testimonios</h2>
-  <div class="testimonials">
-    {% for t in testimonials %}
-    <div class="testimonial-card">
-      <div class="stars">{{ "⭐" * t.stars }}</div>
-      <p>"{{ t.text }}"</p>
-      <div class="who">{{ t.name }}</div>
-    </div>
-    {% endfor %}
-  </div>
-</section>
-
 <section id="contacto">
-  <div class="contact-section">
+  <div class="contact-section reveal">
     <div class="contact-grid">
       <div class="contact-info-panel">
         <span class="section-tag" style="text-align:left; color: rgba(255,255,255,.8)">Contactanos</span>
@@ -397,7 +404,7 @@
 </section>
 
 <section>
-  <div class="cta-banner">
+  <div class="cta-banner reveal">
     <h2>¿Listo para trabajar con nosotros?</h2>
     <p>Contactanos ahora y recibe atencion inmediata.</p>
     <a class="btn btn-primary" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noreferrer">Escribir por WhatsApp</a>
@@ -412,6 +419,43 @@
 
 <a class="whatsapp-float" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noreferrer" title="Escribenos por WhatsApp">💬</a>
 <div class="demo-badge">🚀 DEMO — Sitio de muestra</div>
+
+<script>
+  var revealEls = document.querySelectorAll('.reveal');
+  var counters = document.querySelectorAll('[data-count]');
+
+  function animateCounter(el) {
+    var target = parseFloat(el.getAttribute('data-count'));
+    var suffix = el.getAttribute('data-suffix') || '';
+    var isInt = target % 1 === 0;
+    var duration = 1000;
+    var start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      var progress = Math.min((ts - start) / duration, 1);
+      var val = target * progress;
+      el.textContent = (isInt ? Math.floor(val) : val.toFixed(1)) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          entry.target.querySelectorAll('[data-count]').forEach(animateCounter);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(function (el) { observer.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add('visible'); });
+    counters.forEach(animateCounter);
+  }
+</script>
 
 </body>
 </html>
