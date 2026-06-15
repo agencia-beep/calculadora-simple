@@ -99,3 +99,12 @@ def get_grouped_niches() -> dict:
             }
         )
     return grouped
+
+
+def get_category_for_niche(niche_value: str) -> str:
+    """Devuelve la categoria de un nicho dado, o "" si no se encuentra."""
+    niche_value = (niche_value or "").strip().lower()
+    for niche in NICHE_PRESETS:
+        if niche["value"].lower() == niche_value:
+            return niche["category"]
+    return ""

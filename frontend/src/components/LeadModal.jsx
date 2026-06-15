@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { generateMessages } from "../api";
+import { generateDemo, generateMessages } from "../api";
 
 export default function LeadModal({ lead, onClose, onUpdated }) {
   const [current, setCurrent] = useState(lead);
   const [loading, setLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
   const [error, setError] = useState("");
 
   async function handleGenerate() {
@@ -17,6 +18,21 @@ export default function LeadModal({ lead, onClose, onUpdated }) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleGenerateDemo() {
+    setDemoLoading(true);
+    setError("");
+    try {
+      const result = await generateDemo(current.id);
+      const updated = { ...current, demo_slug: result.slug };
+      setCurrent(updated);
+      onUpdated(updated);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDemoLoading(false);
     }
   }
 
@@ -73,6 +89,30 @@ export default function LeadModal({ lead, onClose, onUpdated }) {
             )}
           </div>
           <pre>{current.call_script || "—"}</pre>
+        </div>
+
+        <div className="modal-section">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h4 style={{ margin: 0 }}>Demo de pagina web</h4>
+            {current.demo_slug && (
+              <a
+                className="btn btn-secondary btn-small"
+                href={`/demos/${current.demo_slug}/index.html`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Ver demo
+              </a>
+            )}
+          </div>
+          <p style={{ color: "var(--color-text-muted)", fontSize: 13, marginTop: 8 }}>
+            {current.demo_slug
+              ? "Demo generada. Abrela para revisarla antes de enviarla al cliente."
+              : "Genera una pagina web demo de ejemplo para este negocio (util si no tiene website)."}
+          </p>
+          <button className="btn btn-secondary btn-small" onClick={handleGenerateDemo} disabled={demoLoading}>
+            {demoLoading ? "Generando..." : current.demo_slug ? "Regenerar demo" : "Generar demo"}
+          </button>
         </div>
 
         <div className="modal-actions">

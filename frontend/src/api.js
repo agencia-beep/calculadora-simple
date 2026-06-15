@@ -77,6 +77,11 @@ export async function generateMessages(leadId) {
   return resp.json();
 }
 
+export async function generateDemo(leadId) {
+  const resp = await request(`/leads/${leadId}/demo`, { method: "POST" });
+  return resp.json();
+}
+
 export async function deleteLead(leadId) {
   await request(`/leads/${leadId}`, { method: "DELETE" });
 }

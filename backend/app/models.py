@@ -75,6 +75,7 @@ class Lead(Base):
     whatsapp_message = Column(Text)
     email_message = Column(Text)
     call_script = Column(Text)
+    demo_slug = Column(String)
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -6,17 +6,21 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from pathlib import Path
+
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from . import messages, places, scoring
 from .auth import generate_token, get_current_client, require_admin
 from .database import Base, engine, get_db
+from .demo_site import generate_demo_for_lead
 from .export_excel import build_excel
 from .models import Client, Lead, SavedSearch
-from .niche_presets import get_grouped_niches
+from .niche_presets import get_category_for_niche, get_grouped_niches
 from .schemas import (
     ClientCreate,
     ClientOut,
@@ -39,6 +43,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+DEMOS_DIR = Path(__file__).resolve().parent.parent.parent / "docs" / "demos"
+DEMOS_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/demos", StaticFiles(directory=str(DEMOS_DIR), html=True), name="demos")
 
 
 @app.get("/api/health")
@@ -245,6 +253,22 @@ async def generate_messages(lead_id: int, client: Client = Depends(get_current_c
     db.commit()
     db.refresh(lead)
     return lead
+
+
+@app.post("/api/leads/{lead_id}/demo")
+def generate_demo(lead_id: int, client: Client = Depends(get_current_client), db: Session = Depends(get_db)):
+    lead = db.query(Lead).filter(Lead.id == lead_id, Lead.client_id == client.id).first()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead no encontrado")
+
+    category = get_category_for_niche(lead.niche)
+    result = generate_demo_for_lead(lead, category=category)
+
+    lead.demo_slug = result["slug"]
+    lead.updated_at = datetime.utcnow()
+    db.commit()
+
+    return {"slug": result["slug"], "preview_path": f"/demos/{result['slug']}/index.html"}
 
 
 @app.delete("/api/leads/{lead_id}")

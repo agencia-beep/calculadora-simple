@@ -44,6 +44,7 @@ class LeadOut(BaseModel):
     whatsapp_message: Optional[str]
     email_message: Optional[str]
     call_script: Optional[str]
+    demo_slug: Optional[str]
     created_at: datetime
     is_new: bool = False
 
