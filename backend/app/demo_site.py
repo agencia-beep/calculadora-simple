@@ -92,6 +92,13 @@ THEMES = {
     "flooring1": "1610465299996-30f240ac2b1c",
     "fence1": "1601581875309-fafbf2d3ed3a",
     "ac1": "1605152276897-4f618f831968",
+    "landscape1": "1416879612866-a29fb56797a3",
+    "landscape2": "1416169607610-59f5a6b29dc7",
+    "landscape3": "1490750967868-88f7d6fe1e5b",
+    "landscape4": "1448375240586-882707db888b",
+    "landscape5": "1598300042247-d088f8ab3a91",
+    "garden1": "1416879612866-a29fb56797a3",
+    "garden2": "1416169607610-59f5a6b29dc7",
 }
 
 
@@ -132,7 +139,14 @@ NICHE_IMAGES = {
     "plomero": _set("plumber", "tools", ["plumber", "tools", "construction_hero", "house3", "renovation"], ["plumber", "tools", "renovation"]),
     "electricista": _set("tools", "construction_hero", ["tools", "construction_hero", "house3", "renovation", "house4"], ["tools", "construction_hero", "renovation"]),
     "aire acondicionado": _set("ac1", "tools", ["ac1", "construction_hero", "tools", "house3", "renovation"], ["ac1", "tools", "construction_hero"]),
-    "paisajismo": _set("house5", "house3", ["house5", "house3", "house1", "house4", "construction_hero"], ["house5", "house3", "house1"]),
+    "paisajismo": _set("landscape1", "landscape2", ["landscape1", "landscape2", "landscape3", "landscape4", "landscape5"], ["landscape2", "landscape3", "landscape4"]),
+    "jardineria": _set("landscape2", "landscape3", ["landscape2", "landscape3", "landscape1", "landscape4", "landscape5"], ["landscape3", "landscape1", "landscape4"]),
+    "jardinero": _set("landscape1", "landscape4", ["landscape1", "landscape4", "landscape2", "landscape3", "landscape5"], ["landscape4", "landscape2", "landscape3"]),
+    "landscaping": _set("landscape1", "landscape2", ["landscape1", "landscape2", "landscape3", "landscape4", "landscape5"], ["landscape2", "landscape3", "landscape4"]),
+    "lawn care": _set("landscape3", "landscape1", ["landscape3", "landscape1", "landscape2", "landscape4", "landscape5"], ["landscape1", "landscape3", "landscape2"]),
+    "poda de arboles": _set("landscape4", "landscape2", ["landscape4", "landscape2", "landscape1", "landscape3", "landscape5"], ["landscape2", "landscape4", "landscape1"]),
+    "corte de cesped": _set("landscape5", "landscape1", ["landscape5", "landscape1", "landscape2", "landscape3", "landscape4"], ["landscape1", "landscape5", "landscape2"]),
+    "tree service": _set("landscape4", "landscape5", ["landscape4", "landscape5", "landscape1", "landscape2", "landscape3"], ["landscape5", "landscape4", "landscape1"]),
     "pintor": _set("painter1", "renovation", ["painter1", "renovation", "house3", "tools", "construction_hero"], ["painter1", "renovation", "house3"]),
     "pisos": _set("flooring1", "livingroom", ["flooring1", "livingroom", "renovation", "house3", "tools"], ["flooring1", "livingroom", "renovation"]),
     "cercas": _set("fence1", "house5", ["fence1", "house5", "construction_hero", "tools", "house3"], ["fence1", "house5", "construction_hero"]),
@@ -302,6 +316,14 @@ CATEGORY_TEXT = {
         ],
         "highlights": ["Atencion en español", "Precios justos", "Ubicacion accesible"],
     },
+    "Landscaping": {
+        "services": [
+            {"icon": "leaf", "title": "Diseño de jardines", "description": "Creamos diseños personalizados que complementan la arquitectura de tu propiedad y tu estilo."},
+            {"icon": "tool", "title": "Instalacion completa", "description": "Desde patios y senderos hasta jardines y arboles, gestionamos todo el proceso de instalacion."},
+            {"icon": "sun", "title": "Mantenimiento continuo", "description": "Mantén tu propiedad impecable durante todo el año con nuestros planes de mantenimiento profesional."},
+        ],
+        "highlights": ["Artesania experta con decadas de experiencia", "Enfoque ecologico con plantas nativas", "Servicio completo de diseño a mantenimiento"],
+    },
 }
 
 DEFAULT_TEXT = {
@@ -328,6 +350,7 @@ CATEGORY_DEFAULT_IMAGES = {
     "Eventos": NICHE_IMAGES["salon de eventos"],
     "Educacion": NICHE_IMAGES["academia"],
     "Comunidad hispana": NICHE_IMAGES["restaurante"],
+    "Landscaping": NICHE_IMAGES["paisajismo"],
 }
 
 # Paleta blanca y limpia, con un color de acento por categoria acorde al nicho.
@@ -343,6 +366,7 @@ CATEGORY_COLORS = {
     "Eventos": ("#7c3aed", "#6d28d9"),
     "Educacion": ("#2563eb", "#1d4ed8"),
     "Comunidad hispana": ("#f59e0b", "#b45309"),
+    "Landscaping": ("#22c55e", "#15803d"),
 }
 DEFAULT_COLOR = ("#2563eb", "#1d4ed8")
 
@@ -384,7 +408,14 @@ def build_demo_html(lead, category: str = "") -> str:
         query = quote(f"{lead.business_name} {lead.address or city}")
         map_embed_url = f"https://maps.google.com/maps?q={query}&z=14&output=embed"
 
-    template_name = "demo_template_realestate.html" if category == "Bienes raices" else "demo_template.html"
+    _landscaping_keywords = ("paisaj", "jardin", "landscap", "lawn", "grass", "poda", "cesped", "tree service", "arbol")
+    _is_landscaping = any(kw in niche_value for kw in _landscaping_keywords) or category == "Landscaping"
+    if _is_landscaping:
+        template_name = "demo_template_landscaping.html"
+    elif category == "Bienes raices":
+        template_name = "demo_template_realestate.html"
+    else:
+        template_name = "demo_template.html"
     template = _env.get_template(template_name)
     return template.render(
         business_name=lead.business_name,
