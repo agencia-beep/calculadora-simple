@@ -206,6 +206,8 @@ ICON_PATHS = {
     "mail": '<path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/>',
     "send": '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
     "zap": '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    "chevron-left": '<polyline points="15 18 9 12 15 6"/>',
+    "chevron-right": '<polyline points="9 18 15 12 9 6"/>',
 }
 
 
