@@ -384,7 +384,8 @@ def build_demo_html(lead, category: str = "") -> str:
         query = quote(f"{lead.business_name} {lead.address or city}")
         map_embed_url = f"https://maps.google.com/maps?q={query}&z=14&output=embed"
 
-    template = _env.get_template("demo_template.html")
+    template_name = "demo_template_realestate.html" if category == "Bienes raices" else "demo_template.html"
+    template = _env.get_template(template_name)
     return template.render(
         business_name=lead.business_name,
         niche=lead.niche,

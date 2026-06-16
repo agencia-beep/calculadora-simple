@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{{ business_name }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+{% macro icon(name, size=20) %}
+<svg class="icon" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ icons[name] | safe }}</svg>
+{% endmacro %}
+
+:root {
+  --p: {{ primary_color }};
+  --pd: {{ primary_color_dark }};
+  --bg: #ffffff;
+  --bg2: #f8fafc;
+  --fg: #0f172a;
+  --mu: #64748b;
+  --bdr: #e2e8f0;
+  --rad: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 4px 16px rgba(0,0,0,0.07);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--fg); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { text-decoration: none; }
+img { display: block; }
+
+/* --- UTILITIES --- */
+.grad-text {
+  background: linear-gradient(135deg, var(--fg) 0%, var(--p) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; padding-bottom: 0.05em;
+}
+.card { background: var(--bg); border: 1px solid var(--bdr); border-radius: var(--rad); box-shadow: var(--shadow-sm); }
+.section-tag {
+  display: inline-block; padding: 4px 14px; font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  background: var(--bg); border: 1px solid var(--bdr); border-radius: 999px; color: var(--mu);
+}
+.section-header { text-align: center; margin-bottom: 48px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.section-title { font-size: clamp(32px, 4.5vw, 54px); font-weight: 800; line-height: 1.12; }
+.section-sub { font-size: 17px; color: var(--mu); max-width: 560px; line-height: 1.65; }
+
+/* --- BUTTONS --- */
+.btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 22px; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; border: none; transition: all 0.2s; font-family: inherit; }
+.btn-primary { background: var(--p); color: #fff; }
+.btn-primary:hover { background: var(--pd); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+.btn-secondary { background: transparent; color: var(--fg); border: 1px solid var(--bdr); }
+.btn-secondary:hover { background: var(--bg2); }
+.btn-white { background: #fff; color: var(--fg); }
+.btn-white:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-ghost { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+.btn-ghost:hover { background: rgba(255,255,255,0.25); }
+
+/* --- DEMO BADGE --- */
+.demo-badge {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  background: #fbbf24; color: #78350f;
+  text-align: center; font-size: 11px; font-weight: 700;
+  padding: 5px 16px; letter-spacing: 0.04em;
+}
+
+/* --- NAVBAR --- */
+.nav {
+  position: fixed; top: 28px; left: 50%; transform: translateX(-50%);
+  z-index: 200; width: min(92%, 620px);
+  transition: top 0.3s;
+}
+.nav.scrolled { top: 12px; }
+.nav-inner {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--bdr); border-radius: var(--rad);
+  box-shadow: var(--shadow-sm);
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  transition: box-shadow 0.3s;
+}
+.nav-logo { font-size: 16px; font-weight: 700; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+.nav-links { display: flex; gap: 2px; }
+.nav-links a {
+  color: var(--mu); font-size: 13px; font-weight: 500;
+  padding: 6px 11px; border-radius: 7px;
+  transition: color 0.2s, background 0.2s;
+}
+.nav-links a:hover { color: var(--fg); background: var(--bg2); }
+
+/* --- HERO --- */
+.hero-wrap { position: relative; padding-top: 28px; }
+.hero-bg-bars {
+  position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+  display: flex; align-items: flex-start;
+}
+.hero-bg-bars-left, .hero-bg-bars-right {
+  display: flex; height: 70%; width: 32%;
+  mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+}
+.hero-bg-bars-left { mask-image: linear-gradient(to bottom, black 0%, transparent 100%), linear-gradient(to right, transparent 0%, black 100%); }
+.hero-bg-bars-right { justify-content: flex-end; mask-image: linear-gradient(to bottom, black 0%, transparent 100%), linear-gradient(to left, transparent 0%, black 100%); margin-left: auto; }
+.bar { flex: 1; min-width: 28px; max-width: 80px; background: linear-gradient(to top, var(--p), transparent); opacity: 0.06; }
+
+.hero {
+  position: relative; z-index: 1;
+  padding: 130px 24px 80px;
+  max-width: 1160px; margin: 0 auto;
+  display: flex; flex-direction: column; align-items: center; gap: 56px;
+}
+.hero-text { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 18px; max-width: 720px; }
+.hero-title { font-size: clamp(38px, 6vw, 72px); font-weight: 800; line-height: 1.08; }
+.hero-sub { font-size: 18px; color: var(--mu); line-height: 1.65; }
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+
+/* Tilted cards fan */
+.hero-cards {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; max-width: 920px;
+}
+.hero-card {
+  width: 21%; aspect-ratio: 4/5;
+  border-radius: 14px; overflow: hidden;
+  border: 3px solid #fff;
+  box-shadow: var(--shadow-lg);
+  position: relative; flex-shrink: 0;
+  transition: transform 0.45s cubic-bezier(.22,.68,0,1.2), z-index 0s;
+}
+.hero-card img { width: 100%; height: 100%; object-fit: cover; }
+.hero-card:nth-child(1) { transform: rotate(-9deg) translateY(-18px); z-index: 1; margin-right: -28px; }
+.hero-card:nth-child(2) { transform: rotate(-4deg) translateY(14px); z-index: 2; margin-right: -28px; }
+.hero-card:nth-child(3) { transform: rotate(0deg) translateY(-8px); z-index: 3; margin-right: -28px; }
+.hero-card:nth-child(4) { transform: rotate(4deg) translateY(14px); z-index: 4; margin-right: -28px; }
+.hero-card:nth-child(5) { transform: rotate(9deg) translateY(-18px); z-index: 5; }
+.hero-card:hover { transform: rotate(0) translateY(-32px) scale(1.04) !important; z-index: 20 !important; }
+
+/* --- ABOUT (image bg + blur) --- */
+.about-section { padding: 80px 24px; }
+.about-wrap {
+  max-width: 1100px; margin: 0 auto;
+  border-radius: 20px; overflow: hidden;
+  position: relative; min-height: 500px;
+  display: flex; align-items: center; justify-content: center;
+}
+.about-bg { position: absolute; inset: 0; }
+.about-bg img { width: 100%; height: 100%; object-fit: cover; }
+.about-overlay { position: absolute; inset: 0; background: rgba(15,23,42,0.52); backdrop-filter: blur(3px); }
+.about-content {
+  position: relative; z-index: 2; text-align: center; color: #fff;
+  max-width: 620px; padding: 64px 36px;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+}
+.about-content .section-tag { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.9); }
+.about-content h2 { font-size: clamp(28px, 4vw, 48px); font-weight: 800; color: #fff; line-height: 1.2; }
+.about-content p { font-size: 16px; line-height: 1.75; color: rgba(255,255,255,0.82); }
+.about-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+
+/* --- PROPERTIES GRID --- */
+.section { padding: 80px 24px; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.props-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.prop-card {
+  background: var(--bg); border: 1px solid var(--bdr); border-radius: var(--rad);
+  overflow: hidden; box-shadow: var(--shadow-sm); cursor: pointer;
+  transition: box-shadow 0.3s, transform 0.3s;
+  display: flex; flex-direction: column;
+}
+.prop-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-5px); }
+.prop-img { position: relative; aspect-ratio: 1/1; overflow: hidden; }
+.prop-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+.prop-card:hover .prop-img img { transform: scale(1.06); }
+.prop-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; transition: background 0.3s;
+}
+.prop-card:hover .prop-overlay { background: rgba(0,0,0,0.14); }
+.prop-btn {
+  width: 50px; height: 50px; border-radius: 50%;
+  background: var(--p); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: scale(0.6);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.prop-card:hover .prop-btn { opacity: 1; transform: scale(1); }
+.prop-info { padding: 18px 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex: 1; }
+.prop-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.prop-sub { font-size: 13px; color: var(--mu); line-height: 1.5; }
+
+/* --- SERVICES (tall cards with hover reveal) --- */
+.srv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.srv-card {
+  position: relative; aspect-ratio: 6/7; border-radius: var(--rad); overflow: hidden;
+  cursor: pointer; background: #000;
+}
+.srv-card > img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.5s, opacity 0.3s;
+}
+.srv-card:hover > img { transform: scale(1.06); opacity: 0.85; }
+.srv-num {
+  position: absolute; top: 14px; left: 14px; z-index: 3;
+  width: 30px; height: 30px; border-radius: 7px;
+  background: rgba(255,255,255,0.92); color: var(--fg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  transition: opacity 0.25s;
+}
+.srv-card:hover .srv-num { opacity: 0; }
+.srv-fade { position: absolute; inset-x: 0; bottom: 0; height: 45%; background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%); z-index: 1; }
+.srv-body {
+  position: absolute; inset-x: 8px; bottom: 8px; z-index: 4;
+  padding: 14px 16px; border-radius: 10px;
+}
+.srv-body-bg {
+  position: absolute; inset: 0; border-radius: 10px;
+  background: rgba(255,255,255,0.96);
+  transform: translateY(105%); opacity: 0;
+  transition: transform 0.35s ease, opacity 0.3s ease; z-index: -1;
+}
+.srv-card:hover .srv-body-bg { transform: translateY(0); opacity: 1; }
+.srv-title { font-size: 17px; font-weight: 700; color: #fff; transition: color 0.25s; }
+.srv-card:hover .srv-title { color: var(--fg); }
+.srv-desc {
+  font-size: 13px; color: var(--fg); line-height: 1.5;
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.3s ease, margin 0.3s ease;
+}
+.srv-card:hover .srv-desc { max-height: 100px; opacity: 1; margin-top: 7px; }
+
+/* --- STATS --- */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.stat-card {
+  background: var(--bg); border: 1px solid var(--bdr); border-radius: var(--rad);
+  box-shadow: var(--shadow-sm); padding: 36px 24px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  min-height: 200px;
+}
+.stat-icon-wrap {
+  width: 36px; height: 36px; border-radius: 8px; background: var(--p);
+  display: flex; align-items: center; justify-content: center;
+}
+.stat-icon-wrap svg { color: #fff !important; stroke: #fff !important; }
+.stat-label { font-size: 15px; color: var(--mu); font-weight: 500; text-align: center; }
+.stat-num { font-size: clamp(48px, 6vw, 76px); font-weight: 800; line-height: 1; color: var(--fg); }
+
+/* --- TESTIMONIALS --- */
+.testi-outer { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; scrollbar-width: none; }
+.testi-outer::-webkit-scrollbar { display: none; }
+.testi-track { display: flex; gap: 20px; width: max-content; padding: 4px 8px; }
+.testi-card {
+  width: 580px; padding: 40px;
+  background: var(--bg); border: 1px solid var(--bdr); border-radius: 16px; box-shadow: var(--shadow-sm);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; flex-shrink: 0;
+}
+.testi-left { display: flex; flex-direction: column; justify-content: space-between; gap: 20px; }
+.testi-tag { display: inline-block; padding: 4px 12px; font-size: 12px; background: var(--bg2); border: 1px solid var(--bdr); border-radius: 999px; color: var(--mu); margin-bottom: 6px; }
+.testi-title { font-size: 22px; font-weight: 700; line-height: 1.3; color: var(--fg); }
+.testi-body { font-size: 14px; color: var(--mu); line-height: 1.75; }
+.testi-author { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.testi-author-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--bdr); }
+.testi-author-name { font-size: 14px; font-weight: 600; }
+.testi-author-date { font-size: 12px; color: var(--mu); }
+.testi-photo { border-radius: 12px; overflow: hidden; aspect-ratio: 1/1; }
+.testi-photo img { width: 100%; height: 100%; object-fit: cover; }
+.testi-dots { display: flex; justify-content: center; gap: 6px; margin-top: 20px; }
+.testi-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bdr); cursor: pointer; transition: background 0.2s; border: none; padding: 0; }
+.testi-dot.active { background: var(--fg); }
+
+/* --- CTA --- */
+.cta-section { padding: 0 24px 80px; }
+.cta-inner {
+  max-width: 1100px; margin: 0 auto;
+  background: var(--bg); border: 1px solid var(--bdr); border-radius: 20px;
+  padding: 80px 40px; box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center;
+}
+.cta-info { color: var(--mu); font-size: 15px; line-height: 1.6; }
+.cta-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+
+/* --- FOOTER --- */
+.footer { border-top: 1px solid var(--bdr); padding: 60px 24px 32px; }
+.footer-inner { max-width: 1100px; margin: 0 auto; }
+.footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 40px; margin-bottom: 48px; }
+.footer-brand { display: flex; flex-direction: column; gap: 10px; }
+.footer-brand-name { font-size: 18px; font-weight: 700; }
+.footer-brand-desc { font-size: 14px; color: var(--mu); line-height: 1.6; max-width: 240px; }
+.footer-col h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mu); margin-bottom: 16px; }
+.footer-col a { display: block; color: var(--fg); font-size: 14px; margin-bottom: 10px; opacity: 0.75; transition: opacity 0.2s; }
+.footer-col a:hover { opacity: 1; }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 24px; border-top: 1px solid var(--bdr); font-size: 13px; color: var(--mu); flex-wrap: wrap; gap: 8px; }
+
+/* --- FLOATING WA --- */
+.wa-float {
+  position: fixed; bottom: 24px; right: 24px; z-index: 300;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: #25d366; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(37,211,102,0.4);
+  animation: wa-pulse 2.5s infinite;
+  transition: transform 0.2s;
+}
+.wa-float:hover { transform: scale(1.08); }
+@keyframes wa-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(37,211,102,0.45); }
+  70%  { box-shadow: 0 0 0 14px rgba(37,211,102,0); }
+  100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
+}
+
+/* --- REVEAL ANIMATION --- */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.65s ease, transform 0.65s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.delay-1 { transition-delay: 0.08s; }
+.delay-2 { transition-delay: 0.16s; }
+.delay-3 { transition-delay: 0.24s; }
+.delay-4 { transition-delay: 0.32s; }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
+  .hero-cards { display: none; }
+  .props-grid { grid-template-columns: 1fr 1fr; }
+  .srv-grid { grid-template-columns: 1fr 1fr; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .testi-card { grid-template-columns: 1fr; width: 80vw; }
+  .nav-links { display: none; }
+}
+@media (max-width: 600px) {
+  .props-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+{% macro icon(name, size=20) %}
+<svg class="icon" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ icons[name] | safe }}</svg>
+{% endmacro %}
+
+<!-- Demo badge -->
+<div class="demo-badge">DEMO — Pagina de ejemplo generada automaticamente para {{ business_name }}</div>
+
+<!-- Navbar -->
+<nav class="nav" id="mainNav">
+  <div class="nav-inner">
+    <span class="nav-logo">{{ business_name }}</span>
+    <div class="nav-links">
+      <a href="#nosotros">Nosotros</a>
+      <a href="#propiedades">Propiedades</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+    <a href="{% if whatsapp_number %}https://wa.me/{{ whatsapp_number }}{% else %}#contacto{% endif %}" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px; border-radius: 8px;">
+      Contactar
+    </a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero-wrap">
+  <div class="hero-bg-bars" aria-hidden="true">
+    <div class="hero-bg-bars-left">{% for i in range(8) %}<div class="bar"></div>{% endfor %}</div>
+    <div class="hero-bg-bars-right">{% for i in range(8) %}<div class="bar"></div>{% endfor %}</div>
+  </div>
+
+  <section class="hero">
+    <div class="hero-text reveal">
+      <span class="section-tag">{{ niche | capitalize }}</span>
+      <h1 class="hero-title grad-text">Encuentra tu propiedad ideal en {{ city or 'tu ciudad' }}</h1>
+      <p class="hero-sub">{{ tagline }} Experiencia, confianza y resultados en el mercado inmobiliario local.</p>
+      <div class="hero-btns">
+        <a href="#propiedades" class="btn btn-primary">Ver propiedades</a>
+        <a href="#contacto" class="btn btn-secondary">Hablar con un agente</a>
+      </div>
+    </div>
+
+    <!-- Tilted property cards fan -->
+    <div class="hero-cards">
+      {% set hero_imgs = gallery + [services[0].image, services[1].image] %}
+      {% for i in range(5) %}
+      <div class="hero-card">
+        <img src="{{ hero_imgs[i] }}" alt="Propiedad {{ i + 1 }}" loading="lazy">
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+
+<!-- About -->
+<section class="about-section" id="nosotros">
+  <div class="about-wrap reveal">
+    <div class="about-bg"><img src="{{ about_image }}" alt="{{ business_name }}" loading="lazy"></div>
+    <div class="about-overlay"></div>
+    <div class="about-content">
+      <span class="section-tag">Sobre nosotros</span>
+      <h2>Tu socio inmobiliario de confianza en {{ city or 'la zona' }}</h2>
+      <p>{{ about_text }}</p>
+      <div class="about-btns">
+        <a href="#servicios" class="btn btn-white">Nuestros servicios</a>
+        <a href="#contacto" class="btn btn-ghost">Contactar agente</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Properties -->
+<section class="section" id="propiedades" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-tag">Listados exclusivos</span>
+      <h2 class="section-title grad-text">Propiedades destacadas</h2>
+      <p class="section-sub">Seleccion de propiedades de calidad en {{ city or 'la zona' }} para compradores e inversionistas.</p>
+    </div>
+    <div class="props-grid">
+      {% for svc in services[:3] %}
+      <div class="prop-card reveal {{ 'delay-' + loop.index | string }}">
+        <div class="prop-img">
+          <img src="{{ svc.image }}" alt="{{ svc.title }}" loading="lazy">
+          <div class="prop-overlay">
+            <div class="prop-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7"/><path d="M17 7H7"/><path d="M17 7v10"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="prop-info">
+          <div>
+            <div class="prop-title">{{ svc.title }}</div>
+            <div class="prop-sub">{{ svc.description }}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Services (tall reveal cards) -->
+<section class="section" id="servicios">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-tag">Servicios profesionales</span>
+      <h2 class="section-title grad-text">Nuestros servicios</h2>
+      <p class="section-sub">Soluciones inmobiliarias completas adaptadas a tus necesidades y objetivos.</p>
+    </div>
+    <div class="srv-grid">
+      {% for svc in services %}
+      <div class="srv-card reveal {{ 'delay-' + loop.index | string }}">
+        <img src="{{ svc.image }}" alt="{{ svc.title }}" loading="lazy">
+        <div class="srv-num">{{ loop.index }}</div>
+        <div class="srv-fade"></div>
+        <div class="srv-body">
+          <div class="srv-body-bg"></div>
+          <div class="srv-title">{{ svc.title }}</div>
+          <div class="srv-desc">{{ svc.description }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section class="section" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-tag">Resultados</span>
+      <h2 class="section-title grad-text">Numeros que hablan</h2>
+      <p class="section-sub">Nuestro historial de exito y compromiso en el mercado inmobiliario de {{ city or 'la zona' }}.</p>
+    </div>
+    <div class="stats-grid">
+      {% set stats_items = [
+        {"icon": "home", "label": "Propiedades vendidas", "val": 250},
+        {"icon": "users", "label": "Clientes satisfechos", "val": 320},
+        {"icon": "star",  "label": "Anos de experiencia", "val": 10},
+        {"icon": "award", "label": "Reconocimientos", "val": 5},
+      ] %}
+      {% for s in stats_items %}
+      <div class="stat-card reveal {{ 'delay-' + loop.index | string }}">
+        <div class="stat-icon-wrap">{{ icon(s.icon, 17) }}</div>
+        <div class="stat-label">{{ s.label }}</div>
+        <div class="stat-num" data-count="{{ s.val }}">{{ s.val }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-tag">Testimonios</span>
+      <h2 class="section-title grad-text">Lo que dicen nuestros clientes</h2>
+      <p class="section-sub">Experiencias reales de compradores e inversionistas que confiaron en nosotros.</p>
+    </div>
+    <div class="testi-outer reveal" id="testiOuter">
+      <div class="testi-track" id="testiTrack">
+        {% set testimonials = [
+          {"tag": "Compra exitosa", "title": "Servicio excepcional y atencion personalizada", "body": "El equipo de " ~ business_name ~ " nos acompano en cada paso del proceso. Encontramos la propiedad perfecta en tiempo record y con una atencion que supero todas nuestras expectativas.", "name": "Maria G.", "date": "Octubre 2024", "img": services[0].image},
+          {"tag": "Inversion segura", "title": "Confianza y transparencia en todo momento", "body": "Como inversionista, lo que mas valoro es la honestidad y el conocimiento del mercado. " ~ business_name ~ " nos ofrecio exactamente eso: datos reales y asesoramiento profesional.", "name": "Carlos M.", "date": "Agosto 2024", "img": services[1].image},
+          {"tag": "Primera vivienda", "title": "Hicieron realidad nuestro sueno", "body": "Era nuestra primera vez comprando casa y estabamos muy nerviosos. El equipo nos explico todo con paciencia y nunca nos presionaron. Hoy vivimos en la casa de nuestros suenos.", "name": "Ana y Luis P.", "date": "Junio 2024", "img": services[2 % services|length].image},
+        ] %}
+        {% for t in testimonials %}
+        <div class="testi-card">
+          <div class="testi-left">
+            <div>
+              <span class="testi-tag">{{ t.tag }}</span>
+              <h3 class="testi-title">{{ t.title }}</h3>
+              <p class="testi-body">{{ t.body }}</p>
+            </div>
+            <div class="testi-author">
+              <img src="{{ hero_image }}" alt="{{ t.name }}" class="testi-author-img">
+              <div>
+                <div class="testi-author-name">{{ t.name }}</div>
+                <div class="testi-author-date">{{ t.date }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="testi-photo">
+            <img src="{{ t.img }}" alt="Propiedad" loading="lazy">
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="testi-dots" id="testiDots">
+      <button class="testi-dot active" data-i="0"></button>
+      <button class="testi-dot" data-i="1"></button>
+      <button class="testi-dot" data-i="2"></button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / Contact -->
+<section class="cta-section" id="contacto">
+  <div class="cta-inner reveal">
+    <span class="section-tag">Contacto</span>
+    <h2 class="section-title grad-text">Listo para encontrar tu propiedad ideal?</h2>
+    {% if phone or address %}
+    <p class="cta-info">
+      {% if phone %}{{ phone }}{% endif %}{% if phone and address %} &nbsp;·&nbsp; {% endif %}{% if address %}{{ address }}{% endif %}
+    </p>
+    {% endif %}
+    <div class="cta-btns">
+      {% if whatsapp_number %}<a href="https://wa.me/{{ whatsapp_number }}" class="btn btn-primary">Enviar WhatsApp</a>{% endif %}
+      {% if phone %}<a href="tel:{{ phone }}" class="btn btn-secondary">Llamar ahora</a>{% endif %}
+      <a href="#propiedades" class="btn btn-secondary">Ver propiedades</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-name">{{ business_name }}</div>
+        <p class="footer-brand-desc">{{ niche | capitalize }} de confianza en {{ city or 'la zona' }}. Experiencia y resultados al servicio de tus metas.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Empresa</h4>
+        <a href="#nosotros">Sobre nosotros</a>
+        <a href="#servicios">Servicios</a>
+        <a href="#propiedades">Propiedades</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        {% if phone %}<a href="tel:{{ phone }}">{{ phone }}</a>{% endif %}
+        {% if email %}<a href="mailto:{{ email }}">{{ email }}</a>{% endif %}
+        {% if address %}<a href="#">{{ address }}</a>{% endif %}
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Aviso de privacidad</a>
+        <a href="#">Terminos de servicio</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© {{ year }} {{ business_name }}. Todos los derechos reservados.</span>
+      <span>{{ niche | capitalize }}{% if city %} · {{ city }}{% endif %}</span>
+    </div>
+  </div>
+</footer>
+
+<!-- WhatsApp float -->
+{% if whatsapp_number %}
+<a href="https://wa.me/{{ whatsapp_number }}" class="wa-float" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+{% endif %}
+
+<script>
+// Reveal on scroll
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// Navbar scroll
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY > 60;
+  nav.classList.toggle('scrolled', scrolled);
+  nav.querySelector('.nav-inner').style.boxShadow = scrolled ? '0 4px 20px rgba(0,0,0,0.09)' : '';
+}, { passive: true });
+
+// Stat counter animation
+const counterObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = parseInt(el.dataset.count);
+    const suffix = el.textContent.replace(/[0-9]/g, '');
+    let start = 0; const duration = 1400;
+    const step = (ts) => {
+      if (!start) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      el.textContent = Math.floor(progress * target) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+    counterObs.unobserve(el);
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(el => counterObs.observe(el));
+
+// Testimonials dot navigation
+const outer = document.getElementById('testiOuter');
+const track = document.getElementById('testiTrack');
+const dots = document.querySelectorAll('.testi-dot');
+if (outer && track) {
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const i = parseInt(dot.dataset.i);
+      const card = track.children[i];
+      if (card) outer.scrollTo({ left: card.offsetLeft - outer.offsetLeft, behavior: 'smooth' });
+      dots.forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+    });
+  });
+  outer.addEventListener('scroll', () => {
+    const scrollLeft = outer.scrollLeft;
+    const cardWidth = track.children[0]?.offsetWidth || 1;
+    const idx = Math.round(scrollLeft / (cardWidth + 20));
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  }, { passive: true });
+}
+</script>
+</body>
+</html>
