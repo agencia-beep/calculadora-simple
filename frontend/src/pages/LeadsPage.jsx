@@ -23,6 +23,7 @@ export default function LeadsPage() {
   const [savedSearches, setSavedSearches] = useState([]);
   const [lastForm, setLastForm] = useState(null);
   const [sinceDate, setSinceDate] = useState("");
+  const [nicheFilter, setNicheFilter] = useState("");
 
   useEffect(() => {
     refresh();
@@ -121,6 +122,9 @@ export default function LeadsPage() {
     setActiveLead((prev) => ({ ...prev, ...updated }));
   }
 
+  const uniqueNiches = [...new Set(leads.map((l) => l.niche).filter(Boolean))].sort();
+  const filteredLeads = nicheFilter ? leads.filter((l) => l.niche === nicheFilter) : leads;
+
   return (
     <div>
       <div className="page-header">
@@ -128,7 +132,12 @@ export default function LeadsPage() {
         <p>Encuentra negocios locales con presencia digital debil o sin website.</p>
       </div>
 
-      {error && <div className="banner banner-danger">{error}</div>}
+      {error && (
+        <div className="banner banner-danger" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>{error}</span>
+          <button onClick={() => setError("")} style={{ background: "none", border: "none", color: "inherit", fontWeight: 700, cursor: "pointer", fontSize: 16, lineHeight: 1 }}>✕</button>
+        </div>
+      )}
 
       {savedSearches.length > 0 && (
         <div className="card" style={{ marginBottom: 20 }}>
@@ -166,8 +175,26 @@ export default function LeadsPage() {
 
       <div className="card" style={{ marginTop: 20 }}>
         <div className="toolbar">
-          <strong>{leads.length} leads</strong>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <strong>{filteredLeads.length} leads</strong>
+            {nicheFilter && (
+              <span style={{ fontSize: 12, background: "var(--color-primary)", color: "#fff", padding: "2px 10px", borderRadius: 999 }}>
+                {nicheFilter}
+                <button onClick={() => setNicheFilter("")} style={{ marginLeft: 6, color: "#fff", fontWeight: 700, cursor: "pointer", border: "none", background: "none", fontSize: 12 }}>✕</button>
+              </span>
+            )}
+          </div>
           <div className="toolbar-actions" style={{ alignItems: "center" }}>
+            <select
+              value={nicheFilter}
+              onChange={(e) => setNicheFilter(e.target.value)}
+              style={{ fontSize: 13, padding: "4px 8px", borderRadius: 6, border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)", cursor: "pointer" }}
+            >
+              <option value="">Todos los nichos</option>
+              {uniqueNiches.map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
             <label style={{ fontSize: 13, color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 6 }}>
               Nuevos desde
               <input type="date" value={sinceDate} onChange={(e) => handleSinceChange(e.target.value)} />
@@ -184,7 +211,7 @@ export default function LeadsPage() {
 
       <div style={{ marginTop: 20 }}>
         <LeadsTable
-          leads={leads}
+          leads={filteredLeads}
           onContactStatusChange={handleContactStatusChange}
           onOpenLead={setActiveLead}
           onDelete={handleDelete}

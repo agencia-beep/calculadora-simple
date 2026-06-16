@@ -3,6 +3,7 @@
 Usa exclusivamente endpoints oficiales de Google con la API key del usuario.
 """
 
+import asyncio
 import os
 import re
 import time
@@ -84,7 +85,6 @@ async def nearby_search(lat: float, lng: float, radius_meters: int, keyword: str
                 break
 
             # Google requiere un breve delay antes de que el next_page_token sea valido
-            import asyncio
             await asyncio.sleep(2)
 
     return results[:max_results]

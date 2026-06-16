@@ -78,96 +78,97 @@ async def run_search(req: SearchRequest, client_id: int, db: Session) -> list[Le
         if not place_id:
             continue
 
-        details = await places.get_place_details(place_id)
-        if not details:
-            details = item
+        try:
+            details = await places.get_place_details(place_id)
+            if not details:
+                details = item
 
-        business_status = details.get("business_status") or item.get("business_status")
-        if not scoring.is_prospect(business_status, ""):
-            website_status_final = "no_prospecto"
-        else:
+            business_status = details.get("business_status") or item.get("business_status")
             website = details.get("website")
-            website_unreachable = False
-            classified = scoring.classify_website(website, website_unreachable=False)
+            if not scoring.is_prospect(business_status, ""):
+                website_status_final = "no_prospecto"
+            else:
+                classified = scoring.classify_website(website, website_unreachable=False)
 
-            if classified == "tiene_website":
-                reachable = await places.check_website_reachable(website)
-                if not reachable:
-                    classified = scoring.classify_website(website, website_unreachable=True)
+                if classified == "tiene_website":
+                    reachable = await places.check_website_reachable(website)
+                    if not reachable:
+                        classified = scoring.classify_website(website, website_unreachable=True)
 
-            website_status_final = classified
+                website_status_final = classified
 
-        email = None
-        page_speed_ms = None
-        seo_notes = ""
-        if website and website_status_final in ("tiene_website", "website_deficiente"):
-            analysis = await places.analyze_website(website)
-            email = analysis["email"]
-            page_speed_ms = analysis["load_time_ms"]
-            seo_notes = analysis["seo_notes"]
+            email = None
+            page_speed_ms = None
+            seo_notes = ""
+            if website and website_status_final in ("tiene_website", "website_deficiente"):
+                analysis = await places.analyze_website(website)
+                email = analysis["email"]
+                page_speed_ms = analysis["load_time_ms"]
+                seo_notes = analysis["seo_notes"]
 
-        rating = details.get("rating") or item.get("rating")
-        reviews_count = details.get("user_ratings_total") or item.get("user_ratings_total") or 0
-        phone = details.get("formatted_phone_number") or details.get("international_phone_number")
-        address = details.get("formatted_address") or item.get("vicinity")
-        location = (details.get("geometry") or item.get("geometry") or {}).get("location", {})
-        maps_url = details.get("url")
-        website = details.get("website")
-        category = ", ".join((details.get("types") or item.get("types") or [])[:3])
+            rating = details.get("rating") or item.get("rating")
+            reviews_count = details.get("user_ratings_total") or item.get("user_ratings_total") or 0
+            phone = details.get("formatted_phone_number") or details.get("international_phone_number")
+            address = details.get("formatted_address") or item.get("vicinity")
+            location = (details.get("geometry") or item.get("geometry") or {}).get("location", {})
+            maps_url = details.get("url")
+            category = ", ".join((details.get("types") or item.get("types") or [])[:3])
 
-        score = 0
-        priority = "Baja"
-        diagnosis = ""
+            score = 0
+            priority = "Baja"
+            diagnosis = ""
 
-        if website_status_final != "no_prospecto":
-            score = scoring.calculate_score(
-                website_status=website_status_final,
-                rating=rating,
-                reviews_count=reviews_count,
-                phone=phone,
-                niche=req.niche,
-                city=city_for_leads,
-            )
-            priority = scoring.priority_from_score(score)
-            diagnosis = scoring.build_diagnosis(
-                business_name=details.get("name") or item.get("name", ""),
-                website_status=website_status_final,
-                rating=rating,
-                reviews_count=reviews_count,
-            )
+            if website_status_final != "no_prospecto":
+                score = scoring.calculate_score(
+                    website_status=website_status_final,
+                    rating=rating,
+                    reviews_count=reviews_count,
+                    phone=phone,
+                    niche=req.niche,
+                    city=city_for_leads,
+                )
+                priority = scoring.priority_from_score(score)
+                diagnosis = scoring.build_diagnosis(
+                    business_name=details.get("name") or item.get("name", ""),
+                    website_status=website_status_final,
+                    rating=rating,
+                    reviews_count=reviews_count,
+                )
 
-        lead = db.query(Lead).filter(Lead.client_id == client_id, Lead.place_id == place_id).first()
-        if lead is None:
-            lead = Lead(client_id=client_id, place_id=place_id)
-            db.add(lead)
+            lead = db.query(Lead).filter(Lead.client_id == client_id, Lead.place_id == place_id).first()
+            if lead is None:
+                lead = Lead(client_id=client_id, place_id=place_id)
+                db.add(lead)
 
-        lead.business_name = details.get("name") or item.get("name", "Sin nombre")
-        lead.niche = req.niche
-        lead.category = category
-        lead.address = address
-        lead.city = city_for_leads
-        lead.state = req.state
-        lead.country = req.country
-        lead.phone = phone
-        lead.email = email
-        lead.website = website
-        lead.page_speed_ms = page_speed_ms
-        lead.seo_notes = seo_notes
-        lead.rating = rating
-        lead.reviews_count = reviews_count
-        lead.maps_url = maps_url
-        lead.business_status = business_status
-        lead.lat = location.get("lat")
-        lead.lng = location.get("lng")
-        lead.website_status = website_status_final
-        lead.score = score
-        lead.priority = priority
-        lead.diagnosis = diagnosis
-        lead.updated_at = datetime.utcnow()
-        if not lead.contact_status:
-            lead.contact_status = "No contactado"
+            lead.business_name = details.get("name") or item.get("name", "Sin nombre")
+            lead.niche = req.niche
+            lead.category = category
+            lead.address = address
+            lead.city = city_for_leads
+            lead.state = req.state
+            lead.country = req.country
+            lead.phone = phone
+            lead.email = email
+            lead.website = website
+            lead.page_speed_ms = page_speed_ms
+            lead.seo_notes = seo_notes
+            lead.rating = rating
+            lead.reviews_count = reviews_count
+            lead.maps_url = maps_url
+            lead.business_status = business_status
+            lead.lat = location.get("lat")
+            lead.lng = location.get("lng")
+            lead.website_status = website_status_final
+            lead.score = score
+            lead.priority = priority
+            lead.diagnosis = diagnosis
+            lead.updated_at = datetime.utcnow()
+            if not lead.contact_status:
+                lead.contact_status = "No contactado"
 
-        saved_leads.append(lead)
+            saved_leads.append(lead)
+        except Exception as exc:
+            print(f"[search] Error procesando place_id={place_id}: {exc}")
 
     db.commit()
     for lead in saved_leads:

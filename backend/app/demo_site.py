@@ -15,6 +15,7 @@ import unicodedata
 from pathlib import Path
 from urllib.parse import quote
 
+import httpx
 from jinja2 import Environment, FileSystemLoader
 
 APP_DIR = Path(__file__).resolve().parent
@@ -443,17 +444,53 @@ def build_demo_html(lead, category: str = "") -> str:
     )
 
 
+def _cache_images_in_html(html: str, out_dir: Path) -> str:
+    """Download Unsplash images to out_dir/img/ and replace CDN URLs with local paths."""
+    img_dir = out_dir / "img"
+    img_dir.mkdir(exist_ok=True)
+
+    unsplash_pattern = re.compile(r'https://images\.unsplash\.com/photo-([a-zA-Z0-9-]+)\?([^"\'>\s]*)')
+    seen: dict[str, str] = {}
+
+    def download_and_replace(m: re.Match) -> str:
+        url = m.group(0)
+        if url in seen:
+            return seen[url]
+        photo_id = m.group(1)
+        params = m.group(2)
+        w_match = re.search(r"w=(\d+)", params)
+        w = w_match.group(1) if w_match else "800"
+        filename = f"{photo_id[:24]}-{w}.jpg"
+        local_path = img_dir / filename
+        if not local_path.exists():
+            try:
+                with httpx.Client(timeout=20, follow_redirects=True) as client:
+                    resp = client.get(url)
+                    if resp.status_code == 200:
+                        local_path.write_bytes(resp.content)
+            except Exception:
+                seen[url] = url
+                return url
+        result = f"img/{filename}" if local_path.exists() else url
+        seen[url] = result
+        return result
+
+    return unsplash_pattern.sub(download_and_replace, html)
+
+
 def generate_demo_for_lead(lead, category: str = "") -> dict:
     """Genera el HTML y lo escribe en docs/demos/<slug>/index.html.
 
     Devuelve un dict con `slug` y `relative_path` (para construir la URL de
     GitHub Pages una vez se haga commit y push).
     """
-    html = build_demo_html(lead, category=category)
-
     slug = slugify(lead.business_name)
     out_dir = DEMOS_DIR / slug
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    html = build_demo_html(lead, category=category)
+    html = _cache_images_in_html(html, out_dir)
+
     out_file = out_dir / "index.html"
     out_file.write_text(html, encoding="utf-8")
 
