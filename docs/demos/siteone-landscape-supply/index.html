@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SiteOne Landscape Supply</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+
+<style>
+:root {
+  --p: #ea580c;
+  --pd: #c2410c;
+  --bg: #0c1a0c;
+  --bg2: #152015;
+  --fg: #e8f0e8;
+  --fg2: rgba(232,240,232,0.65);
+  --card: rgba(255,255,255,0.06);
+  --card-border: rgba(255,255,255,0.10);
+  --rad: 12px;
+  --bdr: 1px solid var(--card-border);
+  --content: min(92vw, 1200px);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--fg); line-height: 1.6; overflow-x: hidden; }
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+button { border: none; background: none; cursor: pointer; font: inherit; color: inherit; }
+
+/* ── Utilities ── */
+.container { width: var(--content); margin-inline: auto; }
+.tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 999px; border: var(--bdr); background: var(--card); font-size: .8rem; color: var(--fg2); letter-spacing: .03em; margin-bottom: 12px; }
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ── Navbar ── */
+.nav {
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 200;
+  height: 72px; display: flex; align-items: center;
+  transition: background .4s, backdrop-filter .4s, border-bottom .4s;
+}
+.nav.scrolled {
+  background: rgba(12,26,12,0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.nav-inner { width: var(--content); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { font-size: 1.2rem; font-weight: 700; letter-spacing: -.01em; color: var(--fg); }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a { font-size: .9rem; color: var(--fg2); transition: color .2s; }
+.nav-links a:hover { color: var(--fg); }
+.nav-cta { padding: 9px 22px; background: var(--p); color: #fff; border-radius: 8px; font-size: .9rem; font-weight: 600; transition: background .2s, transform .15s; }
+.nav-cta:hover { background: var(--pd); transform: translateY(-1px); }
+
+/* ── Hero ── */
+.hero { position: relative; width: 100%; height: 100svh; min-height: 600px; overflow: hidden; }
+.hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(110deg, rgba(0,0,0,.72) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.10) 100%); }
+.hero-blur { position: absolute; top: 0; left: 0; width: 55vw; height: 55vw; transform: translate(-30%, -30%); background: radial-gradient(circle, rgba(0,0,0,.5) 30%, transparent 70%); backdrop-filter: blur(4px); border-radius: 50%; pointer-events: none; }
+.hero-content { position: relative; z-index: 10; width: var(--content); margin-inline: auto; padding-top: 140px; display: flex; flex-direction: column; gap: 20px; max-width: 600px; }
+.hero h1 { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 700; line-height: 1.15; letter-spacing: -.02em; color: #fff; }
+.hero p { font-size: 1.1rem; color: rgba(255,255,255,.8); max-width: 480px; }
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.btn-primary { padding: 12px 28px; background: var(--p); color: #fff; border-radius: 8px; font-weight: 600; font-size: .95rem; transition: background .2s, transform .15s; }
+.btn-primary:hover { background: var(--pd); transform: translateY(-2px); }
+.btn-outline { padding: 12px 28px; border: 1px solid rgba(255,255,255,.35); color: #fff; border-radius: 8px; font-weight: 500; font-size: .95rem; transition: border-color .2s, background .2s; }
+.btn-outline:hover { border-color: rgba(255,255,255,.7); background: rgba(255,255,255,.08); }
+
+/* Testimonial card bottom-right */
+.hero-testi {
+  position: absolute; z-index: 10; right: 5%; bottom: 5%;
+  width: min(360px, 88vw); padding: 20px 22px;
+  background: rgba(12,26,12,0.82); backdrop-filter: blur(16px);
+  border: var(--bdr); border-radius: var(--rad);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.hero-stars { display: flex; gap: 3px; }
+.hero-stars svg { color: var(--p); fill: var(--p); width: 16px; height: 16px; }
+.hero-testi p { font-size: .9rem; color: var(--fg2); line-height: 1.5; }
+.testi-author { display: flex; align-items: center; gap: 10px; }
+.testi-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
+.testi-name { font-size: .9rem; font-weight: 600; color: var(--fg); }
+.testi-role { font-size: .8rem; color: var(--fg2); }
+
+/* ── About ── */
+.about { padding: 100px 0; }
+.about-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; }
+.about-card {
+  position: relative; padding: 60px 52px;
+  background: var(--card); border: var(--bdr); border-radius: var(--rad);
+  display: flex; flex-direction: column; gap: 24px;
+}
+.about-quote-icon {
+  position: absolute; top: -22px; left: -22px;
+  width: 52px; height: 52px; border-radius: 10px;
+  background: var(--p); display: flex; align-items: center; justify-content: center;
+}
+.about-quote-icon svg { color: #fff; width: 26px; height: 26px; }
+.about-card h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 700; line-height: 1.25; letter-spacing: -.01em; }
+.about-attr { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--fg2); }
+.about-attr .dot { color: var(--p); }
+.about-img-wrap { border-radius: var(--rad); overflow: hidden; background: var(--card); border: var(--bdr); }
+.about-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── Services (numbered steps) ── */
+.services { padding: 80px 0; }
+.section-header { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; margin-bottom: 56px; }
+.section-header h2 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; }
+.section-header p { color: var(--fg2); font-size: 1.05rem; max-width: 540px; }
+.srv-list { display: flex; flex-direction: column; gap: 20px; }
+.srv-step {
+  display: flex; justify-content: space-between; gap: 24px;
+  padding: 40px; background: var(--card); border: var(--bdr); border-radius: var(--rad);
+  overflow: hidden;
+}
+.srv-left { display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 24px; }
+.srv-tag-row { display: flex; align-items: center; gap: 10px; }
+.srv-tag { display: inline-block; padding: 4px 12px; background: rgba(255,255,255,.07); border-radius: 999px; font-size: .8rem; color: var(--fg2); }
+.srv-step h3 { font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
+.srv-detail h4 { font-size: 1.2rem; font-weight: 600; margin-bottom: 6px; }
+.srv-detail p { font-size: .95rem; color: var(--fg2); }
+.srv-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 20px; width: 280px; flex-shrink: 0; }
+.srv-num { font-size: 5rem; font-weight: 800; color: var(--p); opacity: .7; line-height: 1; }
+.srv-img { width: 100%; aspect-ratio: 1; border-radius: 10px; overflow: hidden; }
+.srv-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+.srv-step:hover .srv-img img { transform: scale(1.04); }
+.srv-step:nth-child(odd) .srv-img { transform: rotate(3deg); }
+.srv-step:nth-child(even) .srv-img { transform: rotate(-3deg); }
+
+/* ── Why Us ── */
+.why { padding: 80px 0; }
+.why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.why-card { position: relative; aspect-ratio: 4/5; border-radius: var(--rad); overflow: hidden; }
+.why-card img { width: 100%; height: 100%; object-fit: cover; }
+.why-card-blur {
+  position: absolute; inset-x: 0; bottom: 0; height: 40%;
+  background: linear-gradient(transparent, rgba(0,0,0,.85));
+}
+.why-card-text { position: absolute; inset-x: 20px; bottom: 20px; }
+.why-card-text h3 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.why-card-text p { font-size: .85rem; color: rgba(255,255,255,.75); }
+
+/* ── Testimonials CTA ── */
+.testi-section { padding: 80px 0; }
+.testi-box {
+  background: var(--card); border: var(--bdr); border-radius: var(--rad);
+  padding: 70px 40px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 24px;
+}
+.testi-box h2 { font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 700; letter-spacing: -.02em; max-width: 680px; line-height: 1.2; }
+.avatar-stack { display: flex; justify-content: center; }
+.avatar-stack img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid var(--bg); margin-left: -16px; }
+.avatar-stack img:first-child { margin-left: 0; }
+
+/* ── FAQ ── */
+.faq { padding: 80px 0; }
+.faq-grid { background: var(--card); border: var(--bdr); border-radius: var(--rad); padding: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.faq-item { background: var(--bg2); border: var(--bdr); border-radius: 10px; cursor: pointer; overflow: hidden; }
+.faq-q { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; }
+.faq-q span { font-size: .95rem; font-weight: 500; }
+.faq-toggle { flex-shrink: 0; width: 32px; height: 32px; border-radius: 6px; background: var(--p); display: flex; align-items: center; justify-content: center; transition: transform .3s; }
+.faq-toggle svg { color: #fff; }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+.faq-a-inner { padding: 0 18px 16px; font-size: .9rem; color: var(--fg2); line-height: 1.6; }
+.faq-item.open .faq-toggle { transform: rotate(45deg); }
+.faq-item.open .faq-a { max-height: 300px; }
+
+/* ── Contact ── */
+.contact { padding: 80px 0; }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.contact-form { background: var(--card); border: var(--bdr); border-radius: var(--rad); padding: 48px 40px; display: flex; flex-direction: column; gap: 24px; }
+.contact-form .section-header { align-items: flex-start; text-align: left; margin-bottom: 0; }
+.input-group { display: flex; flex-direction: column; gap: 10px; }
+.input-group input,
+.input-group textarea {
+  width: 100%; padding: 13px 16px; background: var(--bg2);
+  border: var(--bdr); border-radius: 8px; color: var(--fg);
+  font-family: inherit; font-size: .95rem;
+  outline: none; transition: border-color .2s;
+}
+.input-group input::placeholder,
+.input-group textarea::placeholder { color: var(--fg2); }
+.input-group input:focus,
+.input-group textarea:focus { border-color: var(--p); }
+.input-group textarea { resize: vertical; min-height: 110px; }
+.btn-submit { width: 100%; padding: 13px; background: var(--p); color: #fff; border-radius: 8px; font-weight: 600; font-size: .95rem; cursor: pointer; transition: background .2s, transform .15s; }
+.btn-submit:hover { background: var(--pd); transform: translateY(-1px); }
+.contact-img { border-radius: var(--rad); overflow: hidden; border: var(--bdr); }
+.contact-img img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── Footer ── */
+.footer { background: var(--p); color: #fff; padding: 64px 0 28px; margin-top: 40px; }
+.footer-top { display: flex; justify-content: space-between; gap: 40px; margin-bottom: 48px; }
+.footer-brand h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -.01em; }
+.footer-cols { display: flex; gap: 48px; flex-wrap: wrap; }
+.footer-col h4 { font-size: .8rem; opacity: .55; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+.footer-col a, .footer-col p { display: block; font-size: .9rem; opacity: .85; margin-bottom: 8px; transition: opacity .2s; }
+.footer-col a:hover { opacity: 1; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,.2); padding-top: 20px; display: flex; justify-content: space-between; font-size: .82rem; opacity: .6; }
+
+/* ── WhatsApp FAB ── */
+.wa-fab {
+  position: fixed; bottom: 24px; right: 24px; z-index: 300;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: #25D366; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,.35);
+  transition: transform .2s;
+}
+.wa-fab:hover { transform: scale(1.1); }
+.wa-fab svg { color: #fff; width: 28px; height: 28px; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .about-grid { grid-template-columns: 1fr; }
+  .about-img-wrap { height: 300px; }
+  .srv-step { flex-direction: column; }
+  .srv-right { width: 100%; flex-direction: row; align-items: flex-end; }
+  .srv-img { width: 48%; }
+  .why-grid { grid-template-columns: 1fr; }
+  .faq-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .contact-img { height: 300px; }
+  .footer-top { flex-direction: column; }
+  .nav-links { display: none; }
+  .hero-testi { bottom: 16px; right: 4%; left: 4%; width: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">SiteOne Landscape Supply</a>
+    <div class="nav-links">
+      <a href="#servicios">Servicios</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+    <a href="#contacto" class="nav-cta">Cotización gratis</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <img class="hero-img" src="https://images.unsplash.com/photo-1416879612866-a29fb56797a3?w=1600&amp;q=75&amp;auto=format&amp;fit=crop" alt="SiteOne Landscape Supply" loading="eager">
+  <div class="hero-overlay"></div>
+  <div class="hero-blur"></div>
+  <div class="hero-content">
+    <div class="tag">paisajismo</div>
+    <h1>Transforma tus espacios exteriores</h1>
+    <p>Atencion profesional y de confianza en Orlando.</p>
+    <div class="hero-btns">
+      <a href="#contacto" class="btn-primary">Obtener cotización gratis</a>
+      <a href="#servicios" class="btn-outline">Nuestros servicios</a>
+    </div>
+  </div>
+
+  <!-- Testimonial card -->
+  
+  <div class="hero-testi">
+    <div class="hero-stars">
+      
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+      
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+      
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+      
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+      
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+      
+    </div>
+    <p>El equipo transformó nuestro jardín completamente. Trabajo profesional, puntual y con resultados increíbles.</p>
+    <div class="testi-author">
+      <img class="testi-avatar" src="https://images.unsplash.com/photo-1416169607610-59f5a6b29dc7?w=900&amp;q=75&amp;auto=format&amp;fit=crop" alt="Cliente">
+      <div>
+        <div class="testi-name">Cliente verificado</div>
+        <div class="testi-role">4.7★ · 85 reseñas en Google</div>
+      </div>
+    </div>
+  </div>
+  
+</section>
+
+<!-- About -->
+<section class="about" id="nosotros">
+  <div class="container">
+    <div class="about-grid reveal">
+      <div class="about-card">
+        <div class="about-quote-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></svg>
+        </div>
+        <div class="tag">Sobre SiteOne Landscape Supply</div>
+        <h2>SiteOne Landscape Supply es un negocio local de paisajismo en Orlando comprometido con ofrecer un servicio de calidad a cada uno de nuestros clientes. Contactanos hoy mismo para mas informacion.</h2>
+        <div class="about-attr">
+          <span>SiteOne Landscape Supply</span>
+          <span class="dot">•</span>
+          <span>Orlando</span>
+        </div>
+      </div>
+      <div class="about-img-wrap">
+        <img src="https://images.unsplash.com/photo-1416169607610-59f5a6b29dc7?w=900&amp;q=75&amp;auto=format&amp;fit=crop" alt="Sobre nosotros">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services: numbered steps -->
+<section class="services" id="servicios">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag">Nuestros servicios</div>
+      <h2>Lo que hacemos</h2>
+      <p>De diseño a mantenimiento, cubrimos cada aspecto de tus espacios exteriores.</p>
+    </div>
+    <div class="srv-list">
+      
+      <div class="srv-step reveal">
+        <div class="srv-left">
+          <div>
+            <div class="srv-tag-row">
+              <span class="srv-tag">Diseño</span>
+            </div>
+            <h3>Reparaciones</h3>
+          </div>
+          <div class="srv-detail">
+            <h4>Servicio profesional</h4>
+            <p>Servicio rapido y garantizado.</p>
+          </div>
+        </div>
+        <div class="srv-right">
+          <span class="srv-num">01</span>
+          <div class="srv-img">
+            <img src="https://images.unsplash.com/photo-1416169607610-59f5a6b29dc7?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Reparaciones" loading="lazy">
+          </div>
+        </div>
+      </div>
+      
+      <div class="srv-step reveal">
+        <div class="srv-left">
+          <div>
+            <div class="srv-tag-row">
+              <span class="srv-tag">Instalación</span>
+            </div>
+            <h3>Presupuestos gratis</h3>
+          </div>
+          <div class="srv-detail">
+            <h4>Servicio profesional</h4>
+            <p>Cotizacion sin costo, sin compromiso.</p>
+          </div>
+        </div>
+        <div class="srv-right">
+          <span class="srv-num">02</span>
+          <div class="srv-img">
+            <img src="https://images.unsplash.com/photo-1490750967868-88f7d6fe1e5b?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Presupuestos gratis" loading="lazy">
+          </div>
+        </div>
+      </div>
+      
+      <div class="srv-step reveal">
+        <div class="srv-left">
+          <div>
+            <div class="srv-tag-row">
+              <span class="srv-tag">Mantenimiento</span>
+            </div>
+            <h3>Servicio a domicilio</h3>
+          </div>
+          <div class="srv-detail">
+            <h4>Servicio profesional</h4>
+            <p>Vamos a tu casa o negocio.</p>
+          </div>
+        </div>
+        <div class="srv-right">
+          <span class="srv-num">03</span>
+          <div class="srv-img">
+            <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Servicio a domicilio" loading="lazy">
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- Why Us -->
+<section class="why">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag">¿Por qué elegirnos?</div>
+      <h2>Lo que nos distingue</h2>
+      <p>Lo que nos hace la mejor opción para tu proyecto.</p>
+    </div>
+    <div class="why-grid reveal">
+      
+      
+      <div class="why-card">
+        <img src="https://images.unsplash.com/photo-1416169607610-59f5a6b29dc7?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Mano de obra garantizada" loading="lazy">
+        <div class="why-card-blur"></div>
+        <div class="why-card-text">
+          <h3>Mano de obra garantizada</h3>
+          <p>Años de trabajo bien hecho respaldan nuestra reputación.</p>
+        </div>
+      </div>
+      
+      <div class="why-card">
+        <img src="https://images.unsplash.com/photo-1490750967868-88f7d6fe1e5b?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Materiales de calidad" loading="lazy">
+        <div class="why-card-blur"></div>
+        <div class="why-card-text">
+          <h3>Materiales de calidad</h3>
+          <p>Escuchamos y diseñamos según tu visión y presupuesto.</p>
+        </div>
+      </div>
+      
+      <div class="why-card">
+        <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Presupuesto claro desde el inicio" loading="lazy">
+        <div class="why-card-blur"></div>
+        <div class="why-card-text">
+          <h3>Presupuesto claro desde el inicio</h3>
+          <p>Trabajo de calidad con garantía en mano de obra y materiales.</p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials CTA -->
+<section class="testi-section" id="testimonios">
+  <div class="container">
+    <div class="testi-box reveal">
+      <div class="tag">Clientes satisfechos</div>
+      <h2>Más de 500 clientes confían en SiteOne Landscape Supply para transformar y mantener sus espacios exteriores</h2>
+      <a href="#contacto" class="btn-primary">Contáctanos hoy</a>
+      <div class="avatar-stack">
+        <img src="https://images.unsplash.com/photo-1416879612866-a29fb56797a3?w=900&amp;q=75&amp;auto=format&amp;fit=crop" alt="">
+        <img src="https://images.unsplash.com/photo-1416169607610-59f5a6b29dc7?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="">
+        <img src="https://images.unsplash.com/photo-1490750967868-88f7d6fe1e5b?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="">
+        <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag">FAQ</div>
+      <h2>Preguntas frecuentes</h2>
+      <p>Todo lo que necesitas saber sobre nuestros servicios.</p>
+    </div>
+    <div class="faq-grid reveal">
+      
+      
+      <div class="faq-item">
+        <div class="faq-q">
+          <span>¿Cuánto tiempo toma un proyecto típico?</span>
+          <div class="faq-toggle">
+<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Depende del alcance. Un diseño y plantación básico puede tomar 1–3 días; proyectos más complejos con hardscape pueden tomar 1–3 semanas. Te damos un cronograma detallado antes de empezar.</div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q">
+          <span>¿Ofrecen consulta gratuita?</span>
+          <div class="faq-toggle">
+<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Sí. Visitamos tu propiedad sin costo para evaluar el proyecto y entregarte una cotización detallada y sin compromiso.</div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q">
+          <span>¿En qué áreas trabajan?</span>
+          <div class="faq-toggle">
+<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Trabajamos en Orlando y alrededores. Contáctanos para confirmar disponibilidad en tu dirección.</div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q">
+          <span>¿Ofrecen servicios de mantenimiento continuo?</span>
+          <div class="faq-toggle">
+<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Sí. Contamos con planes de mantenimiento mensual y estacional para mantener tu propiedad impecable durante todo el año.</div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q">
+          <span>¿Sus prácticas son ecológicas?</span>
+          <div class="faq-toggle">
+<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Priorizamos plantas nativas, riego eficiente y métodos responsables con el medio ambiente para crear jardines hermosos y sostenibles.</div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q">
+          <span>¿Gestionan permisos o aprobaciones?</span>
+          <div class="faq-toggle">
+<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Sí. Si tu proyecto requiere permisos municipales o aprobación de HOA, te orientamos y podemos gestionarlos por ti.</div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="contact" id="contacto">
+  <div class="container">
+    <div class="contact-grid reveal">
+      <div class="contact-form">
+        <div class="section-header">
+          <div class="tag">Contacto</div>
+          <h2>Obtén tu cotización gratis</h2>
+          <p>Cuéntanos tu proyecto y te respondemos en menos de 24 horas.</p>
+        </div>
+        <div class="input-group">
+          <input type="text" placeholder="Nombre completo">
+          <input type="email" placeholder="Correo electrónico">
+          <input type="tel" placeholder="Teléfono">
+          <textarea placeholder="Cuéntanos sobre tu proyecto..."></textarea>
+        </div>
+        <button class="btn-submit">Enviar mensaje</button>
+        
+        <p style="text-align:center;font-size:.85rem;color:var(--fg2);">O llámanos: <a href="tel:(407) 944-1400" style="color:var(--p);font-weight:600;">(407) 944-1400</a></p>
+        
+      </div>
+      <div class="contact-img">
+        <img src="https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Contacto" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h2>SiteOne Landscape Supply</h2>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4>Servicios</h4>
+          
+          <a href="#servicios">Reparaciones</a>
+          
+          <a href="#servicios">Presupuestos gratis</a>
+          
+          <a href="#servicios">Servicio a domicilio</a>
+          
+        </div>
+        <div class="footer-col">
+          <h4>Empresa</h4>
+          <a href="#nosotros">Nosotros</a>
+          <a href="#testimonios">Testimonios</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contacto</h4>
+          <p>(407) 944-1400</p>
+          
+          <p>Orlando</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 SiteOne Landscape Supply</span>
+      <div style="display:flex;gap:20px;">
+        <span>Política de privacidad</span>
+        <span>Términos</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- WhatsApp FAB -->
+
+<a class="wa-fab" href="https://wa.me/4079441400" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+</a>
+
+
+<script>
+// Navbar scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// Scroll reveal
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// FAQ accordion
+document.querySelectorAll('.faq-item').forEach(item => {
+  item.querySelector('.faq-q').addEventListener('click', () => {
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(o => o.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>
