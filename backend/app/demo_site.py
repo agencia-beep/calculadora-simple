@@ -336,6 +336,14 @@ CATEGORY_TEXT = {
         ],
         "highlights": ["Artesania experta con decadas de experiencia", "Enfoque ecologico con plantas nativas", "Servicio completo de diseño a mantenimiento"],
     },
+    "Limpieza": {
+        "services": [
+            {"icon": "home", "title": "Limpieza residencial", "description": "Limpieza profunda de hogares con productos profesionales. Cocinas, banos, dormitorios y areas comunes impecables."},
+            {"icon": "clipboard", "title": "Limpieza comercial", "description": "Oficinas, locales y espacios comerciales limpios y sanitizados. Servicio fuera de horario para no interrumpir tu negocio."},
+            {"icon": "droplet", "title": "Limpieza de mudanza", "description": "Limpieza completa antes o despues de mudarte. Dejamos cada rincon listo para estrenar."},
+        ],
+        "highlights": ["Personal verificado y de confianza", "Productos ecologicos y seguros para mascotas", "Satisfaccion garantizada o repetimos sin costo"],
+    },
 }
 
 DEFAULT_TEXT = {
@@ -363,6 +371,7 @@ CATEGORY_DEFAULT_IMAGES = {
     "Educacion": NICHE_IMAGES["academia"],
     "Comunidad hispana": NICHE_IMAGES["restaurante"],
     "Landscaping": NICHE_IMAGES["paisajismo"],
+    "Limpieza": NICHE_IMAGES["limpieza"],
 }
 
 # Paleta blanca y limpia, con un color de acento por categoria acorde al nicho.
@@ -379,6 +388,7 @@ CATEGORY_COLORS = {
     "Educacion": ("#2563eb", "#1d4ed8"),
     "Comunidad hispana": ("#f59e0b", "#b45309"),
     "Landscaping": ("#22c55e", "#15803d"),
+    "Limpieza": ("#0ea5e9", "#0284c7"),
 }
 DEFAULT_COLOR = ("#2563eb", "#1d4ed8")
 
@@ -421,9 +431,13 @@ def build_demo_html(lead, category: str = "") -> str:
         map_embed_url = f"https://maps.google.com/maps?q={query}&z=14&output=embed"
 
     _landscaping_keywords = ("paisaj", "jardin", "landscap", "lawn", "grass", "poda", "cesped", "tree service", "arbol")
+    _cleaning_keywords = ("limpieza", "cleaning", "cleaner", "maid", "housekeep", "janitorial", "aseo", "sanitiz")
     _is_landscaping = any(kw in niche_value for kw in _landscaping_keywords) or category == "Landscaping"
+    _is_cleaning = any(kw in niche_value for kw in _cleaning_keywords)
     if _is_landscaping:
         template_name = "demo_template_landscaping.html"
+    elif _is_cleaning:
+        template_name = "demo_template_cleaning.html"
     elif category == "Bienes raices":
         template_name = "demo_template_realestate.html"
     else:
