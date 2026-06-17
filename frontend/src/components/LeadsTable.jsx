@@ -5,6 +5,7 @@ import {
   WEBSITE_STATUS_LABELS,
   scoreColor,
 } from "../constants";
+import Icon from "./Icon";
 
 export default function LeadsTable({ leads, onContactStatusChange, onOpenLead, onDelete }) {
   if (leads.length === 0) {
@@ -44,8 +45,14 @@ export default function LeadsTable({ leads, onContactStatusChange, onOpenLead, o
                 {lead.maps_url && (
                   <>
                     {" "}
-                    <a href={lead.maps_url} target="_blank" rel="noreferrer" title="Ver en Google Maps">
-                      📍
+                    <a
+                      href={lead.maps_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Ver en Google Maps"
+                      style={{ display: "inline-flex", verticalAlign: "middle", color: "var(--color-text-muted)" }}
+                    >
+                      <Icon name="mapPin" size={14} />
                     </a>
                   </>
                 )}
@@ -106,10 +113,14 @@ export default function LeadsTable({ leads, onContactStatusChange, onOpenLead, o
               <td>
                 <div style={{ display: "flex", gap: 6 }}>
                   <button className="btn btn-secondary btn-small" onClick={() => onOpenLead(lead)}>
-                    Mensajes
+                    <Icon name="messageSquare" size={14} /> Mensajes
                   </button>
-                  <button className="btn btn-secondary btn-small" onClick={() => onDelete(lead.id)} title="Eliminar">
-                    ✕
+                  <button
+                    className="btn btn-secondary btn-small btn-icon"
+                    onClick={() => onDelete(lead.id)}
+                    title="Eliminar"
+                  >
+                    <Icon name="trash" size={14} />
                   </button>
                 </div>
               </td>

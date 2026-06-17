@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import DashboardPage from "./pages/DashboardPage";
 import LeadsPage from "./pages/LeadsPage";
 import { clearClientToken, getClientToken, getHealth, setClientToken } from "./api";
+import Icon from "./components/Icon";
 
 function AccessGate({ onAccess }) {
   const [token, setToken] = useState("");
@@ -70,24 +71,29 @@ export default function App() {
         <nav>
           <div className="nav-label">Menu</div>
           <button className={page === "leads" ? "active" : ""} onClick={() => setPage("leads")}>
-            🔍 Buscar leads
+            <Icon name="search" size={18} /> Buscar leads
           </button>
           <button className={page === "dashboard" ? "active" : ""} onClick={() => setPage("dashboard")}>
-            📊 Dashboard
+            <Icon name="grid" size={18} /> Dashboard
           </button>
         </nav>
         <div className="sidebar-footer">
           <nav>
-            <button onClick={handleLogout}>← Cerrar sesion</button>
+            <button onClick={handleLogout}>
+              <Icon name="logout" size={18} /> Cerrar sesion
+            </button>
           </nav>
         </div>
       </aside>
 
       <main className="main-content">
         {health && health.google_places_configured === false && (
-          <div className="banner">
-            ⚠️ La API key de Google Places no esta configurada en el backend (archivo <code>.env</code>).
-            Las busquedas no funcionaran hasta que agregues <code>GOOGLE_PLACES_API_KEY</code>.
+          <div className="banner" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <Icon name="alert" size={18} style={{ flexShrink: 0 }} />
+            <span>
+              La API key de Google Places no esta configurada en el backend (archivo <code>.env</code>).
+              Las busquedas no funcionaran hasta que agregues <code>GOOGLE_PLACES_API_KEY</code>.
+            </span>
           </div>
         )}
 

@@ -14,6 +14,7 @@ import {
 import SearchForm from "../components/SearchForm";
 import LeadsTable from "../components/LeadsTable";
 import LeadModal from "../components/LeadModal";
+import Icon from "../components/Icon";
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState([]);
@@ -135,7 +136,9 @@ export default function LeadsPage() {
       {error && (
         <div className="banner banner-danger" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span>{error}</span>
-          <button onClick={() => setError("")} style={{ background: "none", border: "none", color: "inherit", fontWeight: 700, cursor: "pointer", fontSize: 16, lineHeight: 1 }}>✕</button>
+          <button onClick={() => setError("")} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", display: "inline-flex", padding: 0 }} title="Cerrar">
+            <Icon name="x" size={16} />
+          </button>
         </div>
       )}
 
@@ -159,10 +162,10 @@ export default function LeadsPage() {
                 </div>
                 <div style={{ display: "flex", gap: 6 }}>
                   <button className="btn btn-secondary btn-small" onClick={() => handleRunSavedSearch(s.id)} disabled={loading}>
-                    Buscar ahora
+                    <Icon name="zap" size={14} /> Buscar ahora
                   </button>
-                  <button className="btn btn-secondary btn-small" onClick={() => handleDeleteSavedSearch(s.id)}>
-                    ✕
+                  <button className="btn btn-secondary btn-small btn-icon" onClick={() => handleDeleteSavedSearch(s.id)} title="Eliminar">
+                    <Icon name="trash" size={14} />
                   </button>
                 </div>
               </div>
@@ -178,9 +181,11 @@ export default function LeadsPage() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <strong>{filteredLeads.length} leads</strong>
             {nicheFilter && (
-              <span style={{ fontSize: 12, background: "var(--color-primary)", color: "#fff", padding: "2px 10px", borderRadius: 999 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, background: "var(--color-primary)", color: "#fff", padding: "3px 6px 3px 10px", borderRadius: 999 }}>
                 {nicheFilter}
-                <button onClick={() => setNicheFilter("")} style={{ marginLeft: 6, color: "#fff", fontWeight: 700, cursor: "pointer", border: "none", background: "none", fontSize: 12 }}>✕</button>
+                <button onClick={() => setNicheFilter("")} style={{ display: "inline-flex", color: "#fff", cursor: "pointer", border: "none", background: "none", padding: 0 }} title="Quitar filtro">
+                  <Icon name="x" size={13} />
+                </button>
               </span>
             )}
           </div>
@@ -200,10 +205,10 @@ export default function LeadsPage() {
               <input type="date" value={sinceDate} onChange={(e) => handleSinceChange(e.target.value)} />
             </label>
             <a className="btn btn-secondary" href={exportCsvUrl()} download>
-              Exportar CSV
+              <Icon name="download" size={14} /> CSV
             </a>
             <a className="btn btn-secondary" href={exportXlsxUrl()} download>
-              Exportar Excel
+              <Icon name="download" size={14} /> Excel
             </a>
           </div>
         </div>

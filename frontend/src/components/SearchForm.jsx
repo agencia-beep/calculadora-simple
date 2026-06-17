@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getNiches } from "../api";
+import Icon from "./Icon";
 
 const initialState = {
   niche: "",
@@ -121,11 +122,11 @@ export default function SearchForm({ onSearch, onSaveSearch, loading }) {
 
       <div style={{ marginTop: 18, display: "flex", gap: 8 }}>
         <button className="btn" type="submit" disabled={loading}>
-          {loading ? "Buscando..." : "Buscar negocios"}
+          <Icon name="search" size={16} /> {loading ? "Buscando..." : "Buscar negocios"}
         </button>
         {onSaveSearch && (
           <button type="button" className="btn btn-secondary" onClick={() => onSaveSearch(form)}>
-            Guardar esta busqueda
+            <Icon name="bookmark" size={16} /> Guardar esta busqueda
           </button>
         )}
       </div>
