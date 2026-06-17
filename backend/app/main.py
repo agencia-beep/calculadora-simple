@@ -10,7 +10,7 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
@@ -47,6 +47,13 @@ app.add_middleware(
 DEMOS_DIR = Path(__file__).resolve().parent.parent.parent / "docs" / "demos"
 DEMOS_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/demos", StaticFiles(directory=str(DEMOS_DIR), html=True), name="demos")
+
+FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+
+
+@app.get("/health")
+def health_root():
+    return {"status": "ok"}
 
 
 @app.get("/api/health")
@@ -428,3 +435,15 @@ async def run_saved_search(saved_id: int, client: Client = Depends(get_current_c
     db.commit()
 
     return leads
+
+
+# Servir el frontend React (debe ir al final para no pisar las rutas /api/*)
+if FRONTEND_DIST.exists():
+    app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIST / "assets")), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def serve_frontend(full_path: str):
+        file = FRONTEND_DIST / full_path
+        if file.exists() and file.is_file():
+            return FileResponse(file)
+        return FileResponse(FRONTEND_DIST / "index.html")
