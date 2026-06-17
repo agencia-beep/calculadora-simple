@@ -14,7 +14,7 @@ function AccessGate({ onAccess }) {
   }
 
   return (
-    <div className="app-shell" style={{ alignItems: "center", justifyContent: "center" }}>
+    <div className="access-gate">
       <form className="card" style={{ maxWidth: 380, width: "100%" }} onSubmit={handleSubmit}>
         <h2 style={{ marginTop: 0 }}>Acceso</h2>
         <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>
@@ -65,17 +65,22 @@ export default function App() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <h1>Local Web Lead Finder</h1>
+        <h1>LeadFinder</h1>
         <div className="subtitle">Prospeccion de negocios locales</div>
         <nav>
+          <div className="nav-label">Menu</div>
           <button className={page === "leads" ? "active" : ""} onClick={() => setPage("leads")}>
-            Buscar leads
+            🔍 Buscar leads
           </button>
           <button className={page === "dashboard" ? "active" : ""} onClick={() => setPage("dashboard")}>
-            Dashboard
+            📊 Dashboard
           </button>
-          <button onClick={handleLogout}>Cerrar sesion</button>
         </nav>
+        <div className="sidebar-footer">
+          <nav>
+            <button onClick={handleLogout}>← Cerrar sesion</button>
+          </nav>
+        </div>
       </aside>
 
       <main className="main-content">
