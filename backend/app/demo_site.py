@@ -514,7 +514,6 @@ def generate_demo_for_lead(lead, category: str = "") -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     html = build_demo_html(lead, category=category)
-    html = _cache_images_in_html(html, out_dir)
 
     out_file = out_dir / "index.html"
     out_file.write_text(html, encoding="utf-8")
