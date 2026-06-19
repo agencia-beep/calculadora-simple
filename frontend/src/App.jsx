@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import DashboardPage from "./pages/DashboardPage";
 import LeadsPage from "./pages/LeadsPage";
+import PipelinePage from "./pages/PipelinePage";
 import { clearClientToken, getClientToken, getHealth, setClientToken } from "./api";
 import Icon from "./components/Icon";
 
@@ -73,6 +74,9 @@ export default function App() {
           <button className={page === "leads" ? "active" : ""} onClick={() => setPage("leads")}>
             <Icon name="search" size={18} /> Buscar leads
           </button>
+          <button className={page === "pipeline" ? "active" : ""} onClick={() => setPage("pipeline")}>
+            <Icon name="trendingUp" size={18} /> Pipeline
+          </button>
           <button className={page === "dashboard" ? "active" : ""} onClick={() => setPage("dashboard")}>
             <Icon name="grid" size={18} /> Dashboard
           </button>
@@ -98,6 +102,7 @@ export default function App() {
         )}
 
         {page === "leads" && <LeadsPage />}
+        {page === "pipeline" && <PipelinePage />}
         {page === "dashboard" && <DashboardPage />}
       </main>
     </div>

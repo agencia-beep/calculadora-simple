@@ -27,7 +27,7 @@ class SavedSearch(Base):
     country = Column(String, nullable=False)
     zip_code = Column(String)
     language = Column(String, default="es")
-    radius_km = Column(Float, default=5)
+    radius_miles = Column(Float, default=3)
     max_results = Column(Integer, default=20)
 
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -77,5 +77,27 @@ class Lead(Base):
     call_script = Column(Text)
     demo_slug = Column(String)
 
+    next_follow_up = Column(DateTime, nullable=True)
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class LeadNote(Base):
+    __tablename__ = "lead_notes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    lead_id = Column(Integer, ForeignKey("leads.id"), index=True, nullable=False)
+    text = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class LeadActivity(Base):
+    __tablename__ = "lead_activities"
+
+    id = Column(Integer, primary_key=True, index=True)
+    lead_id = Column(Integer, ForeignKey("leads.id"), index=True, nullable=False)
+    activity_type = Column(String, nullable=False)
+    # created | status_change | note_added | follow_up_set | demo_generated | messages_generated
+    description = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)

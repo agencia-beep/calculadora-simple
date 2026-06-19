@@ -11,7 +11,7 @@ class SearchRequest(BaseModel):
     country: str
     zip_code: Optional[str] = ""
     language: str = "es"
-    radius_km: float = 5
+    radius_miles: float = 3
     max_results: int = 20
 
 
@@ -45,6 +45,7 @@ class LeadOut(BaseModel):
     email_message: Optional[str]
     call_script: Optional[str]
     demo_slug: Optional[str]
+    next_follow_up: Optional[datetime]
     created_at: datetime
     is_new: bool = False
 
@@ -56,6 +57,35 @@ class ContactStatusUpdate(BaseModel):
     contact_status: str
 
 
+class FollowUpUpdate(BaseModel):
+    next_follow_up: Optional[datetime] = None
+
+
+class LeadNoteCreate(BaseModel):
+    text: str
+
+
+class LeadNoteOut(BaseModel):
+    id: int
+    lead_id: int
+    text: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class LeadActivityOut(BaseModel):
+    id: int
+    lead_id: int
+    activity_type: str
+    description: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 class DashboardStats(BaseModel):
     total_leads: int
     sin_website: int
@@ -64,6 +94,7 @@ class DashboardStats(BaseModel):
     contactados: int
     reuniones: int
     cerrados: int
+    seguimientos_vencidos: int
 
 
 class ClientCreate(BaseModel):
@@ -88,7 +119,7 @@ class SavedSearchCreate(BaseModel):
     country: str
     zip_code: Optional[str] = ""
     language: str = "es"
-    radius_km: float = 5
+    radius_miles: float = 3
     max_results: int = 20
 
 

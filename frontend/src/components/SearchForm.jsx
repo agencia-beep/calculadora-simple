@@ -9,7 +9,7 @@ const initialState = {
   country: "",
   zip_code: "",
   language: "es",
-  radius_km: 5,
+  radius_miles: 3,
   max_results: 20,
 };
 
@@ -27,7 +27,7 @@ export default function SearchForm({ onSearch, onSaveSearch, loading }) {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: name === "radius_km" || name === "max_results" ? Number(value) : value,
+      [name]: name === "radius_miles" || name === "max_results" ? Number(value) : value,
     }));
   }
 
@@ -90,15 +90,15 @@ export default function SearchForm({ onSearch, onSaveSearch, loading }) {
           </select>
         </div>
         <div className="field">
-          <label htmlFor="radius_km">Radio de busqueda (km)</label>
+          <label htmlFor="radius_miles">Radio de busqueda (millas)</label>
           <input
-            id="radius_km"
-            name="radius_km"
+            id="radius_miles"
+            name="radius_miles"
             type="number"
             min="1"
-            max="50"
+            max="30"
             step="0.5"
-            value={form.radius_km}
+            value={form.radius_miles}
             onChange={handleChange}
           />
         </div>

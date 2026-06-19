@@ -133,3 +133,33 @@ export async function runSavedSearch(id) {
   const resp = await request(`/saved-searches/${id}/run`, { method: "POST" });
   return resp.json();
 }
+
+export async function updateFollowUp(leadId, nextFollowUp) {
+  const resp = await request(`/leads/${leadId}/follow-up`, {
+    method: "PATCH",
+    body: JSON.stringify({ next_follow_up: nextFollowUp }),
+  });
+  return resp.json();
+}
+
+export async function getLeadNotes(leadId) {
+  const resp = await request(`/leads/${leadId}/notes`);
+  return resp.json();
+}
+
+export async function createLeadNote(leadId, text) {
+  const resp = await request(`/leads/${leadId}/notes`, {
+    method: "POST",
+    body: JSON.stringify({ text }),
+  });
+  return resp.json();
+}
+
+export async function deleteLeadNote(leadId, noteId) {
+  await request(`/leads/${leadId}/notes/${noteId}`, { method: "DELETE" });
+}
+
+export async function getLeadActivity(leadId) {
+  const resp = await request(`/leads/${leadId}/activity`);
+  return resp.json();
+}

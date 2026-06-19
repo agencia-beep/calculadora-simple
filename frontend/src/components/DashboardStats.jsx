@@ -8,6 +8,7 @@ const ITEMS = [
   { key: "contactados", label: "Contactados", icon: "mail", bg: "#dbeafe", color: "#2563eb" },
   { key: "reuniones", label: "Reuniones", icon: "calendar", bg: "#e0e7ff", color: "#4f46e5" },
   { key: "cerrados", label: "Cerrados", icon: "check", bg: "#dcfce7", color: "#15803d" },
+  { key: "seguimientos_vencidos", label: "Seguimientos vencidos", icon: "alert", bg: "#fee2e2", color: "#b91c1c" },
 ];
 
 export default function DashboardStats({ stats }) {

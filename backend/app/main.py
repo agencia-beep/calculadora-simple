@@ -19,13 +19,17 @@ from .auth import generate_token, get_current_client, require_admin
 from .database import Base, engine, get_db
 from .demo_site import generate_demo_for_lead
 from .export_excel import build_excel
-from .models import Client, Lead, SavedSearch
+from .models import Client, Lead, LeadActivity, LeadNote, SavedSearch
 from .niche_presets import get_category_for_niche, get_grouped_niches
 from .schemas import (
     ClientCreate,
     ClientOut,
     ContactStatusUpdate,
     DashboardStats,
+    FollowUpUpdate,
+    LeadActivityOut,
+    LeadNoteCreate,
+    LeadNoteOut,
     LeadOut,
     SavedSearchCreate,
     SavedSearchOut,
@@ -61,6 +65,10 @@ def health():
     return {"status": "ok", "google_places_configured": bool(places.GOOGLE_API_KEY)}
 
 
+def _log_activity(db: Session, lead_id: int, activity_type: str, description: str) -> None:
+    db.add(LeadActivity(lead_id=lead_id, activity_type=activity_type, description=description))
+
+
 async def run_search(req: SearchRequest, client_id: int, db: Session) -> list[Lead]:
     if not req.zip_code and not req.city:
         raise HTTPException(status_code=400, detail="Debes indicar una ciudad o un codigo postal")
@@ -69,7 +77,7 @@ async def run_search(req: SearchRequest, client_id: int, db: Session) -> list[Le
         lat, lng, formatted_address = await places.geocode_location(
             req.city or "", req.state or "", req.country, req.zip_code or ""
         )
-        radius_meters = int(req.radius_km * 1000)
+        radius_meters = int(req.radius_miles * 1609.34)
         raw_results = await places.nearby_search(
             lat, lng, radius_meters, req.niche, req.max_results, req.language
         )
@@ -143,6 +151,7 @@ async def run_search(req: SearchRequest, client_id: int, db: Session) -> list[Le
                 )
 
             lead = db.query(Lead).filter(Lead.client_id == client_id, Lead.place_id == place_id).first()
+            is_new_lead = lead is None
             if lead is None:
                 lead = Lead(client_id=client_id, place_id=place_id)
                 db.add(lead)
@@ -172,6 +181,10 @@ async def run_search(req: SearchRequest, client_id: int, db: Session) -> list[Le
             lead.updated_at = datetime.utcnow()
             if not lead.contact_status:
                 lead.contact_status = "No contactado"
+
+            db.flush()
+            if is_new_lead:
+                _log_activity(db, lead.id, "created", f"Lead encontrado en busqueda de '{req.niche}'")
 
             saved_leads.append(lead)
         except Exception as exc:
@@ -230,11 +243,94 @@ def update_contact_status(
     if not lead:
         raise HTTPException(status_code=404, detail="Lead no encontrado")
 
+    previous_status = lead.contact_status
     lead.contact_status = payload.contact_status
     lead.updated_at = datetime.utcnow()
+    if previous_status != payload.contact_status:
+        _log_activity(db, lead.id, "status_change", f"Estado cambiado de '{previous_status}' a '{payload.contact_status}'")
     db.commit()
     db.refresh(lead)
     return lead
+
+
+@app.patch("/api/leads/{lead_id}/follow-up", response_model=LeadOut)
+def update_follow_up(
+    lead_id: int,
+    payload: FollowUpUpdate,
+    client: Client = Depends(get_current_client),
+    db: Session = Depends(get_db),
+):
+    lead = db.query(Lead).filter(Lead.id == lead_id, Lead.client_id == client.id).first()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead no encontrado")
+
+    lead.next_follow_up = payload.next_follow_up
+    lead.updated_at = datetime.utcnow()
+    if payload.next_follow_up:
+        _log_activity(db, lead.id, "follow_up_set", f"Seguimiento programado para {payload.next_follow_up.strftime('%Y-%m-%d')}")
+    else:
+        _log_activity(db, lead.id, "follow_up_set", "Seguimiento eliminado")
+    db.commit()
+    db.refresh(lead)
+    return lead
+
+
+@app.get("/api/leads/{lead_id}/notes", response_model=list[LeadNoteOut])
+def list_lead_notes(lead_id: int, client: Client = Depends(get_current_client), db: Session = Depends(get_db)):
+    lead = db.query(Lead).filter(Lead.id == lead_id, Lead.client_id == client.id).first()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead no encontrado")
+    return db.query(LeadNote).filter(LeadNote.lead_id == lead_id).order_by(LeadNote.created_at.desc()).all()
+
+
+@app.post("/api/leads/{lead_id}/notes", response_model=LeadNoteOut)
+def create_lead_note(
+    lead_id: int,
+    payload: LeadNoteCreate,
+    client: Client = Depends(get_current_client),
+    db: Session = Depends(get_db),
+):
+    lead = db.query(Lead).filter(Lead.id == lead_id, Lead.client_id == client.id).first()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead no encontrado")
+
+    note = LeadNote(lead_id=lead_id, text=payload.text)
+    db.add(note)
+    _log_activity(db, lead_id, "note_added", payload.text[:120])
+    db.commit()
+    db.refresh(note)
+    return note
+
+
+@app.delete("/api/leads/{lead_id}/notes/{note_id}")
+def delete_lead_note(
+    lead_id: int,
+    note_id: int,
+    client: Client = Depends(get_current_client),
+    db: Session = Depends(get_db),
+):
+    lead = db.query(Lead).filter(Lead.id == lead_id, Lead.client_id == client.id).first()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead no encontrado")
+    note = db.query(LeadNote).filter(LeadNote.id == note_id, LeadNote.lead_id == lead_id).first()
+    if not note:
+        raise HTTPException(status_code=404, detail="Nota no encontrada")
+    db.delete(note)
+    db.commit()
+    return {"ok": True}
+
+
+@app.get("/api/leads/{lead_id}/activity", response_model=list[LeadActivityOut])
+def list_lead_activity(lead_id: int, client: Client = Depends(get_current_client), db: Session = Depends(get_db)):
+    lead = db.query(Lead).filter(Lead.id == lead_id, Lead.client_id == client.id).first()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead no encontrado")
+    return (
+        db.query(LeadActivity)
+        .filter(LeadActivity.lead_id == lead_id)
+        .order_by(LeadActivity.created_at.desc())
+        .all()
+    )
 
 
 @app.post("/api/leads/{lead_id}/messages", response_model=LeadOut)
@@ -257,6 +353,7 @@ async def generate_messages(lead_id: int, client: Client = Depends(get_current_c
     lead.call_script = generated["call_script"]
     lead.diagnosis = generated["diagnosis"]
     lead.updated_at = datetime.utcnow()
+    _log_activity(db, lead.id, "messages_generated", "Mensajes de WhatsApp, email y guion de llamada generados")
 
     db.commit()
     db.refresh(lead)
@@ -274,6 +371,7 @@ def generate_demo(lead_id: int, client: Client = Depends(get_current_client), db
 
     lead.demo_slug = result["slug"]
     lead.updated_at = datetime.utcnow()
+    _log_activity(db, lead.id, "demo_generated", f"Demo generada: {result['slug']}")
     db.commit()
 
     return {
@@ -305,6 +403,9 @@ def dashboard(client: Client = Depends(get_current_client), db: Session = Depend
         contactados=sum(1 for l in leads if l.contact_status != "No contactado"),
         reuniones=sum(1 for l in leads if l.contact_status == "Reunion agendada"),
         cerrados=sum(1 for l in leads if l.contact_status == "Cerrado"),
+        seguimientos_vencidos=sum(
+            1 for l in leads if l.next_follow_up and l.next_follow_up < datetime.utcnow()
+        ),
     )
 
 
@@ -425,7 +526,7 @@ async def run_saved_search(saved_id: int, client: Client = Depends(get_current_c
         country=saved.country,
         zip_code=saved.zip_code or "",
         language=saved.language or "es",
-        radius_km=saved.radius_km,
+        radius_miles=saved.radius_miles,
         max_results=saved.max_results,
     )
 
