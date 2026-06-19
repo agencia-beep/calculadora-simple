@@ -515,6 +515,38 @@ tr:hover td {
   border-bottom-color: var(--color-primary);
 }
 
+.lead-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  background: var(--color-muted-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 18px;
+}
+
+.lead-info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text);
+  min-width: 0;
+}
+
+.lead-info-item svg {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+
+.lead-info-item a,
+.lead-info-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .modal-section {
   margin-bottom: 18px;
 }

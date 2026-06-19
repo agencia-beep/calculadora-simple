@@ -21,6 +21,7 @@ export default function PipelinePage() {
   const [error, setError] = useState("");
   const [activeLead, setActiveLead] = useState(null);
   const [dragOverStage, setDragOverStage] = useState(null);
+  const [nicheFilter, setNicheFilter] = useState("");
 
   useEffect(() => {
     refresh();
@@ -58,16 +59,36 @@ export default function PipelinePage() {
     if (leadId) moveLead(leadId, stage);
   }
 
+  const uniqueNiches = [...new Set(leads.map((l) => l.niche).filter(Boolean))].sort();
+  const filteredLeads = nicheFilter ? leads.filter((l) => l.niche === nicheFilter) : leads;
+
   const leadsByStage = CONTACT_STATUS_OPTIONS.reduce((acc, stage) => {
-    acc[stage] = leads.filter((l) => l.contact_status === stage);
+    acc[stage] = filteredLeads.filter((l) => l.contact_status === stage);
     return acc;
   }, {});
 
   return (
     <div>
-      <div className="page-header">
-        <h2>Pipeline de prospeccion</h2>
-        <p>Arrastra los leads entre columnas para actualizar su estado de contacto.</p>
+      <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 12 }}>
+        <div>
+          <h2>Pipeline de prospeccion</h2>
+          <p>Arrastra los leads entre columnas para actualizar su estado de contacto.</p>
+        </div>
+        <div className="field" style={{ minWidth: 220 }}>
+          <label htmlFor="niche-filter">Filtrar por nicho</label>
+          <select
+            id="niche-filter"
+            value={nicheFilter}
+            onChange={(e) => setNicheFilter(e.target.value)}
+          >
+            <option value="">Todos los nichos ({leads.length})</option>
+            {uniqueNiches.map((n) => (
+              <option key={n} value={n}>
+                {n} ({leads.filter((l) => l.niche === n).length})
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {error && <div className="banner banner-danger">{error}</div>}

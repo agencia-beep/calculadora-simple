@@ -130,6 +130,39 @@ export default function LeadModal({ lead, onClose, onUpdated }) {
 
         {error && <div className="banner banner-danger">{error}</div>}
 
+        <div className="lead-info-grid">
+          <div className="lead-info-item">
+            <Icon name="phone" size={14} />
+            {current.phone ? <a href={`tel:${current.phone}`}>{current.phone}</a> : <span>—</span>}
+          </div>
+          <div className="lead-info-item">
+            <Icon name="mail" size={14} />
+            {current.email ? <a href={`mailto:${current.email}`}>{current.email}</a> : <span>—</span>}
+          </div>
+          <div className="lead-info-item">
+            <Icon name="mapPin" size={14} />
+            <span>{current.address || "—"}</span>
+          </div>
+          <div className="lead-info-item">
+            <Icon name="externalLink" size={14} />
+            {current.website ? (
+              <a href={current.website} target="_blank" rel="noreferrer">{current.website}</a>
+            ) : (
+              <span>Sin website</span>
+            )}
+          </div>
+          <div className="lead-info-item">
+            <Icon name="star" size={14} />
+            <span>{current.rating ?? "—"} ★ ({current.reviews_count ?? 0} reseñas)</span>
+          </div>
+          {current.maps_url && (
+            <div className="lead-info-item">
+              <Icon name="mapPin" size={14} />
+              <a href={current.maps_url} target="_blank" rel="noreferrer">Ver en Google Maps</a>
+            </div>
+          )}
+        </div>
+
         <div className="modal-tabs">
           {TABS.map((t) => (
             <button
