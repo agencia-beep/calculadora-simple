@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MARY CLEANER HUOSE CORP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+
+
+<style>
+:root {
+  --p: #ea580c;
+  --pd: #c2410c;
+  --bg: #f0f7ff;
+  --bg2: #e1eef9;
+  --fg: #0f2235;
+  --fg2: #4a6080;
+  --card: #ffffff;
+  --card-border: #d0e4f5;
+  --rad: 14px;
+  --bdr: 1px solid var(--card-border);
+  --content: min(92vw, 1200px);
+  --shadow: 0 2px 16px rgba(10,40,80,0.07);
+  --shadow-lg: 0 8px 40px rgba(10,40,80,0.12);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--fg); line-height: 1.6; overflow-x: hidden; }
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+button { border: none; background: none; cursor: pointer; font: inherit; color: inherit; }
+
+.container { width: var(--content); margin-inline: auto; }
+.tag { display: inline-flex; align-items: center; gap: 6px; padding: 5px 16px; border-radius: 999px; background: rgba(59,130,246,0.10); border: 1px solid rgba(59,130,246,0.2); font-size: .8rem; color: var(--p); font-weight: 600; letter-spacing: .04em; margin-bottom: 12px; }
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .65s ease, transform .65s ease; }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ── Navbar ── */
+.nav {
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 200;
+  height: 70px; display: flex; align-items: center;
+  transition: background .3s, box-shadow .3s;
+}
+.nav.scrolled {
+  background: rgba(240,247,255,0.92);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 1px 0 var(--card-border);
+}
+.nav-inner { width: var(--content); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { font-size: 1.15rem; font-weight: 800; letter-spacing: -.01em; color: var(--fg); }
+.nav-logo span { color: var(--p); }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a { font-size: .9rem; color: var(--fg2); transition: color .2s; font-weight: 500; }
+.nav-links a:hover { color: var(--p); }
+.nav-cta { padding: 9px 22px; background: var(--p); color: #fff; border-radius: 8px; font-size: .9rem; font-weight: 600; transition: background .2s, transform .15s, box-shadow .2s; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
+.nav-cta:hover { background: var(--pd); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(59,130,246,0.4); }
+
+/* ── Hero ── */
+.hero { position: relative; width: 100%; height: 100svh; min-height: 600px; overflow: hidden; }
+.hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(120deg, rgba(5,30,60,.80) 0%, rgba(5,30,60,.45) 55%, rgba(5,30,60,.15) 100%); }
+.hero-content { position: relative; z-index: 10; width: var(--content); margin-inline: auto; padding-top: 150px; display: flex; flex-direction: column; gap: 22px; max-width: 640px; }
+.hero h1 { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 800; line-height: 1.12; letter-spacing: -.03em; color: #fff; }
+.hero h1 em { font-style: normal; color: #93c5fd; }
+.hero p { font-size: 1.1rem; color: rgba(255,255,255,.82); max-width: 500px; }
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+.btn-primary { padding: 13px 30px; background: var(--p); color: #fff; border-radius: 8px; font-weight: 700; font-size: .95rem; transition: background .2s, transform .15s, box-shadow .2s; box-shadow: 0 4px 16px rgba(59,130,246,0.4); }
+.btn-primary:hover { background: var(--pd); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(59,130,246,0.5); }
+.btn-outline { padding: 13px 30px; border: 1.5px solid rgba(255,255,255,.45); color: #fff; border-radius: 8px; font-weight: 600; font-size: .95rem; transition: border-color .2s, background .2s; }
+.btn-outline:hover { border-color: rgba(255,255,255,.85); background: rgba(255,255,255,.1); }
+
+/* Hero badge bottom-right */
+.hero-badge {
+  position: absolute; z-index: 10; right: 5%; bottom: 6%;
+  width: min(340px, 88vw); padding: 20px 24px;
+  background: rgba(255,255,255,0.12); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.22); border-radius: var(--rad);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.hero-stars { display: flex; gap: 4px; }
+.hero-stars svg { color: #fbbf24; fill: #fbbf24; width: 16px; height: 16px; }
+.hero-badge p { font-size: .9rem; color: rgba(255,255,255,.9); line-height: 1.5; }
+.badge-author { display: flex; align-items: center; gap: 10px; }
+.badge-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,.3); }
+.badge-name { font-size: .88rem; font-weight: 600; color: #fff; }
+.badge-role { font-size: .78rem; color: rgba(255,255,255,.65); }
+
+/* ── Trust bar ── */
+.trust-bar { background: var(--card); border-bottom: var(--bdr); padding: 20px 0; }
+.trust-items { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; }
+.trust-item { display: flex; align-items: center; gap: 10px; }
+.trust-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(59,130,246,0.08); display: flex; align-items: center; justify-content: center; color: var(--p); }
+.trust-text strong { display: block; font-size: .9rem; font-weight: 700; color: var(--fg); }
+.trust-text span { font-size: .8rem; color: var(--fg2); }
+
+/* ── About ── */
+.about { padding: 100px 0; }
+.about-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 24px; align-items: center; }
+.about-card { background: var(--card); border: var(--bdr); border-radius: var(--rad); padding: 52px 48px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 22px; }
+.about-card h2 { font-size: clamp(1.5rem, 2.5vw, 2.1rem); font-weight: 700; line-height: 1.25; letter-spacing: -.02em; }
+.about-card p { color: var(--fg2); font-size: 1rem; line-height: 1.7; }
+.highlights-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.highlight-item { display: flex; align-items: center; gap: 10px; font-size: .92rem; color: var(--fg); }
+.highlight-dot { width: 22px; height: 22px; border-radius: 50%; background: var(--p); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.highlight-dot svg { color: #fff; width: 12px; height: 12px; }
+.about-img-wrap { border-radius: var(--rad); overflow: hidden; box-shadow: var(--shadow-lg); aspect-ratio: 4/5; }
+.about-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── Services ── */
+.services { padding: 80px 0; background: var(--bg2); }
+.section-header { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; margin-bottom: 56px; }
+.section-header h2 { font-size: clamp(1.9rem, 4vw, 3rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.15; }
+.section-header p { color: var(--fg2); font-size: 1.05rem; max-width: 520px; }
+.srv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+.srv-card { background: var(--card); border: var(--bdr); border-radius: var(--rad); overflow: hidden; box-shadow: var(--shadow); transition: transform .2s, box-shadow .2s; }
+.srv-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.srv-img { width: 100%; aspect-ratio: 16/9; overflow: hidden; }
+.srv-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+.srv-card:hover .srv-img img { transform: scale(1.04); }
+.srv-body { padding: 24px; }
+.srv-num { font-size: .78rem; font-weight: 700; color: var(--p); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+.srv-body h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -.01em; }
+.srv-body p { font-size: .9rem; color: var(--fg2); line-height: 1.6; }
+
+/* ── Why Us ── */
+.why { padding: 80px 0; }
+.why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.why-card { background: var(--card); border: var(--bdr); border-radius: var(--rad); overflow: hidden; box-shadow: var(--shadow); transition: transform .2s; }
+.why-card:hover { transform: translateY(-3px); }
+.why-card-img { width: 100%; aspect-ratio: 4/3; overflow: hidden; }
+.why-card-img img { width: 100%; height: 100%; object-fit: cover; }
+.why-card-body { padding: 22px 24px; }
+.why-card-body h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+.why-card-body p { font-size: .88rem; color: var(--fg2); line-height: 1.55; }
+
+/* ── CTA banner ── */
+.cta-banner { padding: 80px 0; background: var(--p); }
+.cta-inner { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+.cta-inner h2 { font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 800; letter-spacing: -.03em; color: #fff; max-width: 680px; line-height: 1.2; }
+.cta-inner p { color: rgba(255,255,255,.8); font-size: 1.05rem; }
+.btn-white { padding: 14px 34px; background: #fff; color: var(--p); border-radius: 8px; font-weight: 700; font-size: 1rem; transition: transform .15s, box-shadow .2s; box-shadow: 0 4px 16px rgba(0,0,0,.15); }
+.btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,.2); }
+.avatar-stack { display: flex; justify-content: center; }
+.avatar-stack img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,.5); margin-left: -14px; }
+.avatar-stack img:first-child { margin-left: 0; }
+.cta-note { font-size: .85rem; color: rgba(255,255,255,.6); }
+
+/* ── FAQ ── */
+.faq { padding: 80px 0; background: var(--bg2); }
+.faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.faq-item { background: var(--card); border: var(--bdr); border-radius: 10px; cursor: pointer; overflow: hidden; box-shadow: var(--shadow); }
+.faq-q { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px; }
+.faq-q span { font-size: .95rem; font-weight: 600; color: var(--fg); }
+.faq-toggle { flex-shrink: 0; width: 30px; height: 30px; border-radius: 6px; background: var(--p); display: flex; align-items: center; justify-content: center; transition: transform .3s; }
+.faq-toggle svg { color: #fff; }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+.faq-a-inner { padding: 0 20px 16px; font-size: .9rem; color: var(--fg2); line-height: 1.65; }
+.faq-item.open .faq-toggle { transform: rotate(45deg); }
+.faq-item.open .faq-a { max-height: 300px; }
+
+/* ── Contact ── */
+.contact { padding: 80px 0; }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.contact-form { background: var(--card); border: var(--bdr); border-radius: var(--rad); padding: 48px 40px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 22px; }
+.contact-form .section-header { align-items: flex-start; text-align: left; margin-bottom: 0; }
+.input-group { display: flex; flex-direction: column; gap: 12px; }
+.input-group input,
+.input-group textarea {
+  width: 100%; padding: 13px 16px; background: var(--bg);
+  border: var(--bdr); border-radius: 8px; color: var(--fg);
+  font-family: inherit; font-size: .95rem;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+}
+.input-group input::placeholder,
+.input-group textarea::placeholder { color: var(--fg2); }
+.input-group input:focus,
+.input-group textarea:focus { border-color: var(--p); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+.input-group textarea { resize: vertical; min-height: 110px; }
+.btn-submit { width: 100%; padding: 14px; background: var(--p); color: #fff; border-radius: 8px; font-weight: 700; font-size: .95rem; cursor: pointer; transition: background .2s, transform .15s, box-shadow .2s; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
+.btn-submit:hover { background: var(--pd); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(59,130,246,0.4); }
+.contact-img { border-radius: var(--rad); overflow: hidden; box-shadow: var(--shadow-lg); }
+.contact-img img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── Footer ── */
+.footer { background: #0f2235; color: #fff; padding: 60px 0 28px; margin-top: 0; }
+.footer-top { display: flex; justify-content: space-between; gap: 40px; margin-bottom: 48px; }
+.footer-brand h2 { font-size: 1.4rem; font-weight: 800; letter-spacing: -.01em; }
+.footer-brand p { font-size: .88rem; color: rgba(255,255,255,.5); margin-top: 8px; max-width: 240px; }
+.footer-cols { display: flex; gap: 48px; flex-wrap: wrap; }
+.footer-col h4 { font-size: .78rem; opacity: .45; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px; }
+.footer-col a, .footer-col p { display: block; font-size: .88rem; opacity: .75; margin-bottom: 8px; transition: opacity .2s; }
+.footer-col a:hover { opacity: 1; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,.1); padding-top: 20px; display: flex; justify-content: space-between; font-size: .8rem; opacity: .45; }
+
+/* ── WhatsApp FAB ── */
+.wa-fab {
+  position: fixed; bottom: 24px; right: 24px; z-index: 300;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: #25D366; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(37,211,102,0.4);
+  transition: transform .2s;
+}
+.wa-fab:hover { transform: scale(1.1); }
+.wa-fab svg { color: #fff; width: 28px; height: 28px; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .trust-items { gap: 24px; }
+  .about-grid { grid-template-columns: 1fr; }
+  .about-img-wrap { aspect-ratio: 16/9; }
+  .srv-grid { grid-template-columns: 1fr; }
+  .why-grid { grid-template-columns: 1fr 1fr; }
+  .faq-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .contact-img { aspect-ratio: 16/9; }
+  .footer-top { flex-direction: column; }
+  .nav-links { display: none; }
+  .hero-badge { bottom: 12px; right: 4%; left: 4%; width: auto; }
+}
+@media (max-width: 600px) {
+  .why-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">MARY CLEANER HUOSE CORP</a>
+    <div class="nav-links">
+      <a href="#servicios">Servicios</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+    <a href="#contacto" class="nav-cta">Cotización gratis</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <img class="hero-img" src="https://images.unsplash.com/photo-1686178827149-6d55c72d81df?w=1600&amp;q=75&amp;auto=format&amp;fit=crop" alt="MARY CLEANER HUOSE CORP" loading="eager">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="tag">limpieza</div>
+    <h1>Limpieza <em>impecable</em>, cada vez</h1>
+    <p>Atencion profesional y de confianza en Miami.</p>
+    <div class="hero-btns">
+      <a href="#contacto" class="btn-primary">Obtener cotización gratis</a>
+      <a href="#servicios" class="btn-outline">Nuestros servicios</a>
+    </div>
+  </div>
+
+  
+  <div class="hero-badge">
+    <div class="hero-stars">
+      
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+      
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+      
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+      
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+      
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+      
+    </div>
+    <p>"Quedé encantada con el resultado. La casa quedó reluciente y el equipo fue muy profesional y puntual."</p>
+    <div class="badge-author">
+      <img class="badge-avatar" src="https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?w=900&amp;q=75&amp;auto=format&amp;fit=crop" alt="Cliente">
+      <div>
+        <div class="badge-name">Cliente verificado</div>
+        <div class="badge-role">4.8★ · 22 reseñas en Google</div>
+      </div>
+    </div>
+  </div>
+  
+</section>
+
+<!-- Trust bar -->
+<div class="trust-bar">
+  <div class="container">
+    <div class="trust-items">
+      <div class="trust-item">
+        <div class="trust-icon">
+<svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        <div class="trust-text">
+          <strong>100% Garantizado</strong>
+          <span>Satisfacción o repetimos</span>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">
+<svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+</div>
+        <div class="trust-text">
+          <strong>Personal verificado</strong>
+          <span>Equipo profesional y de confianza</span>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">
+<svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+</div>
+        <div class="trust-text">
+          <strong>Horarios flexibles</strong>
+          <span>Trabajamos a tu disponibilidad</span>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">
+<svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+</div>
+        <div class="trust-text">
+          <strong>Productos ecológicos</strong>
+          <span>Seguros para tu familia y mascotas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- About -->
+<section class="about" id="nosotros">
+  <div class="container">
+    <div class="about-grid reveal">
+      <div class="about-card">
+        <div class="tag">Sobre MARY CLEANER HUOSE CORP</div>
+        <h2>MARY CLEANER HUOSE CORP es un negocio local de limpieza en Miami comprometido con ofrecer un servicio de calidad a cada uno de nuestros clientes. Contactanos hoy mismo para mas informacion.</h2>
+        <p>Nos especializamos en ofrecer servicios de limpieza de alta calidad para hogares y negocios en Miami. Cada limpieza es realizada con productos profesionales y atención al detalle.</p>
+        <div class="highlights-list">
+          
+          <div class="highlight-item">
+            <div class="highlight-dot">
+<svg class="icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+            <span>Mano de obra garantizada</span>
+          </div>
+          
+          <div class="highlight-item">
+            <div class="highlight-dot">
+<svg class="icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+            <span>Materiales de calidad</span>
+          </div>
+          
+          <div class="highlight-item">
+            <div class="highlight-dot">
+<svg class="icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+            <span>Presupuesto claro desde el inicio</span>
+          </div>
+          
+        </div>
+      </div>
+      <div class="about-img-wrap">
+        <img src="https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?w=900&amp;q=75&amp;auto=format&amp;fit=crop" alt="Sobre nosotros">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section class="services" id="servicios">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag">Nuestros servicios</div>
+      <h2>¿Qué limpiamos?</h2>
+      <p>Soluciones completas de limpieza adaptadas a cada espacio y necesidad.</p>
+    </div>
+    <div class="srv-grid">
+      
+      <div class="srv-card reveal">
+        <div class="srv-img">
+          <img src="https://images.unsplash.com/photo-1600618528240-fb9fc964b853?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Reparaciones" loading="lazy">
+        </div>
+        <div class="srv-body">
+          <div class="srv-num">01 — Servicio</div>
+          <h3>Reparaciones</h3>
+          <p>Servicio rapido y garantizado.</p>
+        </div>
+      </div>
+      
+      <div class="srv-card reveal">
+        <div class="srv-img">
+          <img src="https://images.unsplash.com/photo-1528740561666-dc2479dc08ab?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Presupuestos gratis" loading="lazy">
+        </div>
+        <div class="srv-body">
+          <div class="srv-num">02 — Servicio</div>
+          <h3>Presupuestos gratis</h3>
+          <p>Cotizacion sin costo, sin compromiso.</p>
+        </div>
+      </div>
+      
+      <div class="srv-card reveal">
+        <div class="srv-img">
+          <img src="https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Servicio a domicilio" loading="lazy">
+        </div>
+        <div class="srv-body">
+          <div class="srv-num">03 — Servicio</div>
+          <h3>Servicio a domicilio</h3>
+          <p>Vamos a tu casa o negocio.</p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- Why Us -->
+<section class="why">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag">¿Por qué elegirnos?</div>
+      <h2>Lo que nos hace diferentes</h2>
+      <p>Más que limpieza — un servicio en el que puedes confiar.</p>
+    </div>
+    <div class="why-grid reveal">
+      
+      
+      <div class="why-card">
+        <div class="why-card-img">
+          <img src="https://images.unsplash.com/photo-1563453392212-326f5e854473?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Mano de obra garantizada" loading="lazy">
+        </div>
+        <div class="why-card-body">
+          <h3>Mano de obra garantizada</h3>
+          <p>Personal capacitado, puntual y con referencias verificadas.</p>
+        </div>
+      </div>
+      
+      <div class="why-card">
+        <div class="why-card-img">
+          <img src="https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Materiales de calidad" loading="lazy">
+        </div>
+        <div class="why-card-body">
+          <h3>Materiales de calidad</h3>
+          <p>Si no quedas satisfecho, regresamos a repetir sin costo adicional.</p>
+        </div>
+      </div>
+      
+      <div class="why-card">
+        <div class="why-card-img">
+          <img src="https://images.unsplash.com/photo-1550963295-019d8a8a61c5?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Presupuesto claro desde el inicio" loading="lazy">
+        </div>
+        <div class="why-card-body">
+          <h3>Presupuesto claro desde el inicio</h3>
+          <p>Cotización gratuita sin sorpresas ni cobros ocultos.</p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- CTA banner -->
+<section class="cta-banner">
+  <div class="container">
+    <div class="cta-inner reveal">
+      <div class="avatar-stack">
+        <img src="https://images.unsplash.com/photo-1686178827149-6d55c72d81df?w=900&amp;q=75&amp;auto=format&amp;fit=crop" alt="">
+        <img src="https://images.unsplash.com/photo-1563453392212-326f5e854473?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="">
+        <img src="https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="">
+        <img src="https://images.unsplash.com/photo-1550963295-019d8a8a61c5?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="">
+      </div>
+      <h2>Más de 200 familias en Miami confían en MARY CLEANER HUOSE CORP</h2>
+      <p>Agenda tu primera limpieza hoy y descubre la diferencia profesional.</p>
+      <a href="#contacto" class="btn-white">Solicitar cotización gratis</a>
+      <p class="cta-note">Sin compromisos · Respuesta en menos de 24 horas</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag">FAQ</div>
+      <h2>Preguntas frecuentes</h2>
+      <p>Todo lo que necesitas saber antes de agendar.</p>
+    </div>
+    <div class="faq-grid reveal">
+      
+      
+      <div class="faq-item">
+        <div class="faq-q">
+          <span>¿Cuánto tiempo toma una limpieza?</span>
+          <div class="faq-toggle">
+<svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Depende del tamaño del espacio. Un apartamento típico toma 2–3 horas; casas más grandes pueden necesitar 4–6 horas. Te damos un estimado antes de comenzar.</div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q">
+          <span>¿Traen sus propios productos?</span>
+          <div class="faq-toggle">
+<svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Sí. Traemos todos los productos y equipos necesarios, incluyendo opciones ecológicas y seguros para niños y mascotas. No necesitas comprar nada.</div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q">
+          <span>¿En qué áreas trabajan?</span>
+          <div class="faq-toggle">
+<svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Servimos en Miami y alrededores. Contáctanos para confirmar disponibilidad en tu dirección específica.</div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q">
+          <span>¿Ofrecen limpiezas recurrentes?</span>
+          <div class="faq-toggle">
+<svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Sí. Contamos con planes semanales, quincenales y mensuales con descuentos especiales para clientes frecuentes.</div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q">
+          <span>¿Qué pasa si no quedo satisfecho?</span>
+          <div class="faq-toggle">
+<svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Tu satisfacción es nuestra prioridad. Si algo no está a tu gusto, regresamos a corregirlo sin costo adicional dentro de las 24 horas.</div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q">
+          <span>¿Necesito estar presente durante la limpieza?</span>
+          <div class="faq-toggle">
+<svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">No es necesario. Muchos clientes nos dejan una llave o código. Todo nuestro personal está verificado y es de total confianza.</div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="contact" id="contacto">
+  <div class="container">
+    <div class="contact-grid reveal">
+      <div class="contact-form">
+        <div class="section-header">
+          <div class="tag">Contacto</div>
+          <h2>Agenda tu limpieza hoy</h2>
+          <p>Cuéntanos qué necesitas y te respondemos en menos de 24 horas con tu cotización.</p>
+        </div>
+        <div class="input-group">
+          <input type="text" placeholder="Nombre completo">
+          <input type="email" placeholder="Correo electrónico">
+          <input type="tel" placeholder="Teléfono">
+          <textarea placeholder="¿Qué tipo de limpieza necesitas? Tamaño del espacio, frecuencia..."></textarea>
+        </div>
+        <button class="btn-submit">Enviar solicitud</button>
+        
+        <p style="text-align:center;font-size:.85rem;color:var(--fg2);">O llámanos directamente: <a href="tel:(786) 262-7586" style="color:var(--p);font-weight:700;">(786) 262-7586</a></p>
+        
+      </div>
+      <div class="contact-img">
+        <img src="https://images.unsplash.com/photo-1584820927498-3b1f61b71e6a?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Contacto" loading="lazy" style="height:100%;min-height:400px;">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h2>MARY CLEANER HUOSE CORP</h2>
+        <p>Servicios de limpieza profesional en Miami.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4>Servicios</h4>
+          
+          <a href="#servicios">Reparaciones</a>
+          
+          <a href="#servicios">Presupuestos gratis</a>
+          
+          <a href="#servicios">Servicio a domicilio</a>
+          
+        </div>
+        <div class="footer-col">
+          <h4>Empresa</h4>
+          <a href="#nosotros">Nosotros</a>
+          <a href="#faq">Preguntas frecuentes</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contacto</h4>
+          <p>(786) 262-7586</p>
+          
+          <p>Miami</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 MARY CLEANER HUOSE CORP</span>
+      <div style="display:flex;gap:20px;">
+        <span>Política de privacidad</span>
+        <span>Términos</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- WhatsApp FAB -->
+
+<a class="wa-fab" href="https://wa.me/7862627586" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+</a>
+
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+}, { threshold: 0.10 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+document.querySelectorAll('.faq-item').forEach(item => {
+  item.querySelector('.faq-q').addEventListener('click', () => {
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(o => o.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>
