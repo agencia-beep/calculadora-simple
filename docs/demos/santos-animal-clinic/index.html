@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Santos Animal Clinic</title>
+<meta name="description" content="Santos Animal Clinic — Veterinaria en Miami. Atencion profesional y de confianza en Miami." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@300..700&display=swap" rel="stylesheet" />
+<style>
+/* ── TOKENS ──────────────────────────────────────────────────────── */
+:root {
+  --p:   #0d9488;
+  --pd:  #0f766e;
+  --bg:  #ffffff;
+  --bg2: #f7f7f5;
+  --fg:  #111827;
+  --mu:  #6b7280;
+  --bdr: #e5e7eb;
+  --rad: 14px;
+  --shadow: 0 2px 16px rgba(0,0,0,.07);
+  --ff-head: 'Playfair Display', Georgia, serif;
+  --ff-body: 'Inter', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--ff-body); color: var(--fg); background: var(--bg); line-height: 1.6; }
+img  { display: block; }
+a    { color: inherit; text-decoration: none; }
+.icon { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; vertical-align:middle; }
+
+/* ── MACRO (must be before body) ───────────────────────────────── */
+
+
+/* ── LAYOUT ─────────────────────────────────────────────────────── */
+.container { width: min(1200px, 92vw); margin: 0 auto; }
+
+/* ── NAVBAR ─────────────────────────────────────────────────────── */
+.nav {
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(20px, 4vw, 60px);
+  height: 68px;
+  background: rgba(255,255,255,.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  transition: box-shadow .3s;
+}
+.nav.scrolled { box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+.nav-brand { font-family: var(--ff-head); font-size: 1.25rem; font-weight: 700; color: var(--fg); }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a { font-size: .9rem; font-weight: 500; color: var(--mu); transition: color .2s; }
+.nav-links a:hover { color: var(--fg); }
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px; border-radius: 30px;
+  background: var(--fg); color: #fff;
+  font-size: .875rem; font-weight: 600;
+  transition: opacity .2s;
+}
+.nav-cta:hover { opacity: .85; }
+@media (max-width:768px) { .nav-links { display:none; } }
+
+/* ── HERO ────────────────────────────────────────────────────────── */
+.hero {
+  position: relative; min-height: 100svh;
+  display: flex; flex-direction: column;
+  background: url('https://images.unsplash.com/photo-1542838132-92c53300491e?w=1600&amp;q=75&amp;auto=format&amp;fit=crop') center/cover no-repeat;
+}
+.hero-blur {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(120deg, rgba(0,0,0,.62) 0%, rgba(0,0,0,.28) 55%, transparent 100%);
+}
+.hero-body {
+  position: relative; z-index: 2;
+  flex: 1; display: flex; align-items: center;
+  padding: 120px clamp(20px, 6vw, 90px) 60px;
+}
+.hero-content { max-width: 560px; }
+.hero-tag {
+  display: inline-block; margin-bottom: 20px;
+  padding: 6px 16px; border-radius: 20px;
+  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
+  font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: #fff;
+}
+.hero h1 {
+  font-family: var(--ff-head); font-size: clamp(2.6rem, 6vw, 4.5rem);
+  font-weight: 700; line-height: 1.1; color: #fff; margin-bottom: 18px;
+  opacity: 0; transform: translateY(20px);
+  animation: fadeUp .9s .15s ease forwards;
+}
+.hero-sub {
+  font-size: clamp(1rem, 2vw, 1.2rem); color: rgba(255,255,255,.88);
+  line-height: 1.6; margin-bottom: 32px;
+  opacity: 0; transform: translateY(20px);
+  animation: fadeUp .9s .3s ease forwards;
+}
+.hero-actions {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  opacity: 0; transform: translateY(20px);
+  animation: fadeUp .9s .45s ease forwards;
+}
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 30px;
+  background: var(--p); color: #fff;
+  font-weight: 600; font-size: .95rem;
+  transition: opacity .2s, transform .2s;
+}
+.btn-primary:hover { opacity: .9; transform: translateY(-2px); }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 26px; border-radius: 30px;
+  border: 1.5px solid rgba(255,255,255,.55); color: #fff;
+  font-weight: 600; font-size: .95rem;
+  transition: background .2s;
+}
+.btn-ghost:hover { background: rgba(255,255,255,.12); }
+.hero-trust {
+  display: flex; align-items: center; gap: 14px;
+  margin-top: 36px;
+  opacity: 0; transform: translateY(20px);
+  animation: fadeUp .9s .6s ease forwards;
+}
+.hero-avatars { display: flex; }
+.hero-avatars img {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 2px solid #fff; object-fit: cover;
+}
+.hero-avatars img + img { margin-left: -12px; }
+.hero-trust-text { font-size: .9rem; font-weight: 600; color: #fff; }
+
+/* ── MARQUEE ─────────────────────────────────────────────────────── */
+.marquee-wrap {
+  position: relative; z-index: 2;
+  overflow: hidden; padding: 16px 0;
+  background: rgba(0,0,0,.25); backdrop-filter: blur(8px);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+.marquee-track {
+  display: flex; width: max-content;
+  animation: marquee 32s linear infinite;
+}
+.marquee-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 20px; margin: 0 6px;
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+  border-radius: 20px; white-space: nowrap;
+  font-size: .85rem; font-weight: 500; color: #fff;
+}
+@keyframes marquee { to { transform: translateX(-50%); } }
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+@keyframes heroZoom { from { background-size: 112%; } to { background-size: 100%; } }
+.hero { animation: heroZoom 14s ease-out forwards; }
+
+/* ── SECTION HEADER ─────────────────────────────────────────────── */
+.section-head { text-align: center; margin-bottom: 52px; }
+.section-tag {
+  display: inline-block; margin-bottom: 14px;
+  padding: 5px 16px; border-radius: 20px;
+  border: 1px solid var(--bdr); font-size: .8rem; color: var(--mu);
+}
+.section-title {
+  font-family: var(--ff-head); font-size: clamp(2rem, 5vw, 3.4rem);
+  font-weight: 700; line-height: 1.15; margin-bottom: 14px; color: var(--fg);
+}
+.section-sub { font-size: 1.05rem; color: var(--mu); max-width: 600px; margin: 0 auto; }
+
+/* ── SERVICES ────────────────────────────────────────────────────── */
+section { padding: 80px 0; }
+#servicios { background: var(--bg); }
+.services-rail {
+  display: flex; gap: 20px;
+  overflow-x: auto; scroll-snap-type: x mandatory;
+  padding-bottom: 12px; padding-left: clamp(20px,4vw,60px); padding-right: clamp(20px,4vw,60px);
+  scrollbar-width: none;
+}
+.services-rail::-webkit-scrollbar { display: none; }
+.srv-card {
+  flex-shrink: 0; scroll-snap-align: start;
+  width: clamp(260px, 30vw, 340px);
+  position: relative; border-radius: var(--rad); overflow: hidden; aspect-ratio: 4/5;
+}
+.srv-card img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .5s ease;
+}
+.srv-card:hover img { transform: scale(1.04); }
+.srv-overlay {
+  position: absolute; inset-x: 0; bottom: 0; height: 45%;
+  background: linear-gradient(transparent, rgba(0,0,0,.75));
+  padding: 20px 22px; display: flex; flex-direction: column; justify-content: flex-end;
+}
+.srv-overlay .icon-pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--p); color: #fff; margin-bottom: 10px;
+}
+.srv-title { font-size: 1.2rem; font-weight: 700; color: #fff; line-height: 1.2; }
+.srv-desc  { font-size: .85rem; color: rgba(255,255,255,.82); margin-top: 4px; }
+.rail-controls {
+  display: flex; justify-content: flex-end; align-items: center; gap: 10px;
+  padding: 16px clamp(20px,4vw,60px) 0;
+}
+.rail-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--bg2); border: 1px solid var(--bdr);
+  cursor: pointer; transition: background .2s;
+}
+.rail-btn:hover { background: var(--fg); color: #fff; }
+
+/* ── STATS BAR ───────────────────────────────────────────────────── */
+.stats { background: var(--bg2); border-top: 1px solid var(--bdr); border-bottom: 1px solid var(--bdr); padding: 32px 0; }
+.stats-inner {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 48px;
+  padding: 0 clamp(20px,4vw,60px);
+}
+.stat { text-align: center; }
+.stat-num {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-family: var(--ff-head); font-size: 2.4rem; font-weight: 700; color: var(--p);
+}
+.stat-label { font-size: .85rem; color: var(--mu); margin-top: 2px; }
+
+/* ── GALLERY ─────────────────────────────────────────────────────── */
+#galeria { background: var(--bg); }
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 200px 200px;
+  gap: 12px;
+  padding: 0 clamp(20px,4vw,60px);
+}
+.gallery-item { border-radius: var(--rad); overflow: hidden; }
+.gallery-item img { width:100%; height:100%; object-fit:cover; transition: transform .5s; }
+.gallery-item:hover img { transform: scale(1.05); }
+.gallery-item:first-child { grid-column: span 2; grid-row: span 2; }
+@media(max-width:700px) {
+  .gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 150px 150px 150px; }
+  .gallery-item:first-child { grid-column: span 2; grid-row: span 1; height: 200px; }
+}
+
+/* ── ABOUT ───────────────────────────────────────────────────────── */
+#nosotros { background: var(--bg2); }
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: center;
+  padding: 0 clamp(20px,4vw,60px);
+}
+@media(max-width:768px){ .about-grid { grid-template-columns: 1fr; } }
+.about-img { border-radius: var(--rad); overflow: hidden; }
+.about-img img { width:100%; height:auto; display:block; }
+.about-tag { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--p); font-weight: 600; margin-bottom: 14px; }
+.about-title { font-family: var(--ff-head); font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; margin-bottom: 18px; line-height: 1.2; }
+.about-body { color: var(--mu); line-height: 1.7; margin-bottom: 28px; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.checklist li { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+.check-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--p); color: #fff; flex-shrink: 0;
+}
+.check-icon .icon { width: 14px; height: 14px; }
+
+/* ── CONTACT ─────────────────────────────────────────────────────── */
+#contacto { background: var(--bg); }
+.contact-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 24px; padding: 0 clamp(20px,4vw,60px);
+  align-items: stretch;
+}
+@media(max-width:768px){ .contact-grid { grid-template-columns: 1fr; } }
+.contact-form-card {
+  background: var(--fg); color: #fff;
+  border-radius: var(--rad); padding: clamp(30px,5vw,56px);
+  display: flex; flex-direction: column; gap: 24px;
+}
+.contact-form-card .section-tag { border-color: rgba(255,255,255,.2); color: rgba(255,255,255,.7); }
+.contact-form-card .section-title { color: #fff; font-size: clamp(1.6rem,3.5vw,2.4rem); margin-bottom: 0; }
+.contact-form-card .section-sub { color: rgba(255,255,255,.7); }
+.contact-rows { display: flex; flex-direction: column; gap: 16px; }
+.crow { display: flex; gap: 14px; align-items: flex-start; }
+.crow .icon { color: var(--p); margin-top: 2px; }
+.crow-body strong { display: block; font-weight: 600; font-size: .95rem; }
+.crow-body span { font-size: .9rem; color: rgba(255,255,255,.7); }
+.wa-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 26px; border-radius: 30px;
+  background: #25D366; color: #fff;
+  font-weight: 700; font-size: 1rem; align-self: flex-start;
+  transition: opacity .2s, transform .2s;
+}
+.wa-btn:hover { opacity: .9; transform: translateY(-2px); }
+.map-card { border-radius: var(--rad); overflow: hidden; min-height: 360px; }
+.map-card iframe { width:100%; height:100%; min-height:360px; border:0; display:block; }
+
+/* ── CTA BANNER ──────────────────────────────────────────────────── */
+.cta-section { background: var(--bg2); }
+.cta-inner {
+  text-align: center; max-width: 700px; margin: 0 auto;
+  padding: 0 20px;
+}
+.cta-inner .section-title { margin-bottom: 12px; }
+.cta-inner p { color: var(--mu); margin-bottom: 28px; }
+
+/* ── FOOTER ──────────────────────────────────────────────────────── */
+footer {
+  background: var(--fg); color: #fff;
+  padding: 56px clamp(20px,4vw,60px) 32px;
+}
+.foot-top {
+  display: flex; flex-wrap: wrap; gap: 40px;
+  justify-content: space-between; align-items: flex-start;
+  margin-bottom: 40px;
+}
+.foot-brand { font-family: var(--ff-head); font-size: 1.5rem; font-weight: 700; }
+.foot-niche { color: rgba(255,255,255,.5); font-size: .9rem; margin-top: 6px; }
+.foot-links { display: flex; flex-direction: column; gap: 10px; }
+.foot-links a { color: rgba(255,255,255,.65); font-size: .9rem; transition: color .2s; }
+.foot-links a:hover { color: #fff; }
+.foot-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 10px;
+  border-top: 1px solid rgba(255,255,255,.12); padding-top: 24px;
+  font-size: .85rem; color: rgba(255,255,255,.4);
+}
+
+/* ── FLOATING ELEMENTS ───────────────────────────────────────────── */
+.wa-float {
+  position: fixed; bottom: 24px; right: 24px; z-index: 500;
+  width: 58px; height: 58px; border-radius: 50%;
+  background: #25D366; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 20px rgba(37,211,102,.4);
+  animation: waPulse 2.5s infinite;
+  transition: transform .2s;
+}
+.wa-float:hover { transform: scale(1.08); }
+@keyframes waPulse {
+  0%,100% { box-shadow: 0 6px 20px rgba(37,211,102,.4); }
+  50%      { box-shadow: 0 6px 28px rgba(37,211,102,.65), 0 0 0 10px rgba(37,211,102,.1); }
+}
+.demo-badge {
+  position: fixed; bottom: 24px; left: 24px; z-index: 500;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 18px; border-radius: 20px;
+  background: #fbbf24; color: #1f2937;
+  font-size: .8rem; font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0,0,0,.2);
+}
+
+/* ── REVEAL ANIMATIONS ───────────────────────────────────────────── */
+.reveal { opacity:0; transform:translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+.stagger.visible > * { opacity:1 !important; transform:translateY(0) !important; }
+.stagger > * { opacity:0; transform:translateY(20px); transition: opacity .55s ease, transform .55s ease; }
+.stagger.visible > *:nth-child(1){ transition-delay:.05s; }
+.stagger.visible > *:nth-child(2){ transition-delay:.15s; }
+.stagger.visible > *:nth-child(3){ transition-delay:.25s; }
+.stagger.visible > *:nth-child(4){ transition-delay:.35s; }
+.stagger.visible > *:nth-child(5){ transition-delay:.45s; }
+</style>
+</head>
+<body>
+
+
+
+<!-- ── NAVBAR ───────────────────────────────────────────────────── -->
+<nav class="nav" id="navbar">
+  <a class="nav-brand" href="#">Santos Animal Clinic</a>
+  <div class="nav-links">
+    <a href="#servicios">Servicios</a>
+    <a href="#nosotros">Nosotros</a>
+    <a href="#galeria">Galeria</a>
+    <a href="#contacto">Contacto</a>
+  </div>
+  <a class="nav-cta" href="https://wa.me/7866771838" target="_blank" rel="noreferrer">
+    <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> WhatsApp
+  </a>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────────── -->
+<header class="hero">
+  <div class="hero-blur" aria-hidden="true"></div>
+
+  <div class="hero-body">
+    <div class="hero-content">
+      <span class="hero-tag">Veterinaria &middot; Miami</span>
+      <h1>Santos Animal Clinic</h1>
+      <p class="hero-sub">Atencion profesional y de confianza en Miami.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="https://wa.me/7866771838" target="_blank" rel="noreferrer">
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> Escribenos por WhatsApp
+        </a>
+        
+        <a class="btn-ghost" href="tel:(786) 677-1838">
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Llamar ahora
+        </a>
+        
+      </div>
+      
+      <div class="hero-trust">
+        <div style="display:flex;gap:6px;align-items:center;color:#f59e0b;">
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <span class="hero-trust-text">
+          4.6/5 &middot; 
+          190+ opiniones
+        </span>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- Marquee strip -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Equipos modernos y certificados</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Personal con amplia experiencia</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Aceptamos seguros y planes de pago</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Equipos modernos y certificados</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Personal con amplia experiencia</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Aceptamos seguros y planes de pago</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Equipos modernos y certificados</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Personal con amplia experiencia</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Aceptamos seguros y planes de pago</span>
+      
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Equipos modernos y certificados</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Personal con amplia experiencia</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Aceptamos seguros y planes de pago</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Equipos modernos y certificados</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Personal con amplia experiencia</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Aceptamos seguros y planes de pago</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Equipos modernos y certificados</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Personal con amplia experiencia</span>
+      
+      <span class="marquee-item"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Aceptamos seguros y planes de pago</span>
+      
+    </div>
+  </div>
+</header>
+
+<!-- ── SERVICIOS ─────────────────────────────────────────────────── -->
+<section id="servicios">
+  <div class="section-head container reveal">
+    <span class="section-tag">Lo que ofrecemos</span>
+    <h2 class="section-title">Nuestros servicios</h2>
+    <p class="section-sub">Soluciones profesionales para Veterinaria en Miami, adaptadas a cada cliente.</p>
+  </div>
+
+  <div class="services-rail stagger reveal" id="srvRail">
+    
+    <div class="srv-card">
+      <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Consultas y diagnostico" loading="lazy" decoding="async" />
+      <div class="srv-overlay">
+        <div class="icon-pill"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div class="srv-title">Consultas y diagnostico</div>
+        <div class="srv-desc">Atencion profesional y personalizada.</div>
+      </div>
+    </div>
+    
+    <div class="srv-card">
+      <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Citas flexibles" loading="lazy" decoding="async" />
+      <div class="srv-overlay">
+        <div class="icon-pill"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="srv-title">Citas flexibles</div>
+        <div class="srv-desc">Horarios que se adaptan a tu rutina.</div>
+      </div>
+    </div>
+    
+    <div class="srv-card">
+      <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Planes de pago" loading="lazy" decoding="async" />
+      <div class="srv-overlay">
+        <div class="icon-pill"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        <div class="srv-title">Planes de pago</div>
+        <div class="srv-desc">Opciones de financiamiento disponibles.</div>
+      </div>
+    </div>
+    
+  </div>
+
+  <div class="rail-controls">
+    <button class="rail-btn" id="srvPrev" aria-label="Anterior"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <button class="rail-btn" id="srvNext" aria-label="Siguiente"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+  </div>
+</section>
+
+<!-- ── STATS ──────────────────────────────────────────────────────── -->
+
+<div class="stats reveal">
+  <div class="stats-inner stagger">
+    
+    <div class="stat">
+      <div class="stat-num"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <span data-count="4.6">0</span></div>
+      <div class="stat-label">Calificacion en Google</div>
+    </div>
+    
+    
+    <div class="stat">
+      <div class="stat-num"><span data-count="190" data-suffix="+">0</span></div>
+      <div class="stat-label">Clientes satisfechos</div>
+    </div>
+    
+    <div class="stat">
+      <div class="stat-num"><span data-count="100" data-suffix="%">0</span></div>
+      <div class="stat-label">Servicio garantizado</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">24/7</div>
+      <div class="stat-label">Respuesta por WhatsApp</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── GALERIA ────────────────────────────────────────────────────── -->
+<section id="galeria">
+  <div class="section-head container reveal">
+    <span class="section-tag">Nuestro espacio</span>
+    <h2 class="section-title">Galeria</h2>
+    <p class="section-sub">Un vistazo a nuestro trabajo y nuestras instalaciones.</p>
+  </div>
+  <div class="gallery reveal">
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=900&amp;q=75&amp;auto=format&amp;fit=crop" alt="Santos Animal Clinic" loading="lazy" decoding="async" /></div>
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Santos Animal Clinic" loading="lazy" decoding="async" /></div>
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Santos Animal Clinic" loading="lazy" decoding="async" /></div>
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1581595219315-a187dd40c322?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Santos Animal Clinic" loading="lazy" decoding="async" /></div>
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1556157382-97eda2d62296?w=600&amp;q=75&amp;auto=format&amp;fit=crop" alt="Santos Animal Clinic" loading="lazy" decoding="async" /></div>
+  </div>
+</section>
+
+<!-- ── NOSOTROS ───────────────────────────────────────────────────── -->
+<section id="nosotros">
+  <div class="about-grid reveal">
+    <div class="about-img">
+      <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=900&amp;q=75&amp;auto=format&amp;fit=crop" alt="Santos Animal Clinic" loading="lazy" decoding="async" />
+    </div>
+    <div class="about-text">
+      <p class="about-tag">Sobre nosotros</p>
+      <h2 class="about-title">Comprometidos con Miami</h2>
+      <p class="about-body">Santos Animal Clinic es un negocio local de Veterinaria en Miami comprometido con ofrecer un servicio de calidad a cada uno de nuestros clientes. Contactanos hoy mismo para mas informacion.</p>
+      <ul class="checklist">
+        
+        <li>
+          <span class="check-icon"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
+          Equipos modernos y certificados
+        </li>
+        
+        <li>
+          <span class="check-icon"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
+          Personal con amplia experiencia
+        </li>
+        
+        <li>
+          <span class="check-icon"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
+          Aceptamos seguros y planes de pago
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACTO ───────────────────────────────────────────────────── -->
+<section id="contacto">
+  <div class="contact-grid reveal">
+    <div class="contact-form-card">
+      <div>
+        <span class="section-tag">Contactanos</span>
+        <h2 class="section-title">Hablemos de tu proyecto</h2>
+        <p class="section-sub">Escribenos hoy y recibe atencion personalizada.</p>
+      </div>
+      <div class="contact-rows">
+        <div class="crow">
+          <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div class="crow-body">
+            <strong>Direccion</strong>
+            <span>1550 W 84th St Ste 78, Hialeah, FL 33014, USA</span>
+          </div>
+        </div>
+        
+        <div class="crow">
+          <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <div class="crow-body">
+            <strong>Telefono</strong>
+            <span>(786) 677-1838</span>
+          </div>
+        </div>
+        
+        
+        <div class="crow">
+          <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div class="crow-body">
+            <strong>Horario</strong>
+            <span>Lunes a Sabado, 8:00am – 6:00pm</span>
+          </div>
+        </div>
+      </div>
+      <a class="wa-btn" href="https://wa.me/7866771838" target="_blank" rel="noreferrer">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> Escribir por WhatsApp
+      </a>
+    </div>
+    <div class="map-card">
+      <iframe src="https://maps.google.com/maps?q=25.8981002,-80.3147793&amp;z=15&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────────────────── -->
+<section class="cta-section">
+  <div class="cta-inner reveal">
+    <h2 class="section-title">Listo para comenzar?</h2>
+    <p>Contactanos ahora y recibe atencion inmediata. Estamos aqui para ayudarte.</p>
+    <a class="btn-primary" href="https://wa.me/7866771838" target="_blank" rel="noreferrer" style="display:inline-flex;">
+      <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> Escribir por WhatsApp
+    </a>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────── -->
+<footer>
+  <div class="foot-top">
+    <div>
+      <div class="foot-brand">Santos Animal Clinic</div>
+      <div class="foot-niche">Veterinaria &middot; Miami</div>
+    </div>
+    <div class="foot-links">
+      <a href="#servicios">Servicios</a>
+      <a href="#galeria">Galeria</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#contacto">Contacto</a>
+      <a href="tel:(786) 677-1838">(786) 677-1838</a>
+      
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>&copy; 2026 Santos Animal Clinic. Todos los derechos reservados.</span>
+    <span>1550 W 84th St Ste 78, Hialeah, FL 33014, USA</span>
+  </div>
+</footer>
+
+<!-- ── FLOATING ───────────────────────────────────────────────────── -->
+<a class="wa-float" href="https://wa.me/7866771838" target="_blank" rel="noreferrer" title="WhatsApp">
+  <svg class="icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+</a>
+<div class="demo-badge">
+  <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> DEMO — Sitio de muestra
+</div>
+
+<script>
+// Navbar scroll shadow
+var nav = document.getElementById('navbar');
+window.addEventListener('scroll', function() {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// Scroll reveal (IntersectionObserver)
+var reveals = document.querySelectorAll('.reveal');
+if ('IntersectionObserver' in window) {
+  var obs = new IntersectionObserver(function(entries, o) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        e.target.querySelectorAll('[data-count]').forEach(animateCounter);
+        o.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(function(el) { obs.observe(el); });
+} else {
+  reveals.forEach(function(el) { el.classList.add('visible'); });
+  document.querySelectorAll('[data-count]').forEach(animateCounter);
+}
+
+// Counter animation
+function animateCounter(el) {
+  var target = parseFloat(el.getAttribute('data-count'));
+  var suffix = el.getAttribute('data-suffix') || '';
+  var isInt = target % 1 === 0;
+  var start = null;
+  (function step(ts) {
+    if (!start) start = ts;
+    var p = Math.min((ts - start) / 900, 1);
+    el.textContent = (isInt ? Math.floor(target * p) : (target * p).toFixed(1)) + suffix;
+    if (p < 1) requestAnimationFrame(step);
+  })(performance.now());
+}
+
+// Services rail prev/next
+var rail = document.getElementById('srvRail');
+document.getElementById('srvPrev').addEventListener('click', function() {
+  rail.scrollBy({ left: -320, behavior: 'smooth' });
+});
+document.getElementById('srvNext').addEventListener('click', function() {
+  rail.scrollBy({ left: 320, behavior: 'smooth' });
+});
+</script>
+</body>
+</html>
