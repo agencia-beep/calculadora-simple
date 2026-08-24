@@ -14,10 +14,9 @@ module.exports = {
       env: { PYTHONUNBUFFERED: "1" },
     },
     {
-      name: "leadfinder-frontend",
-      cwd: root + "\\frontend",
-      script: "npm",
-      args: "run dev",
+      name: "leadfinder-tunnel",
+      script: "C:\\PROGRAM FILES (X86)\\CLOUDFLARED\\CLOUDFLARED.EXE",
+      args: "tunnel run leadfinder-api",
       watch: false,
       autorestart: true,
       max_restarts: 10,

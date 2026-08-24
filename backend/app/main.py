@@ -60,6 +60,19 @@ def health_root():
     return {"status": "ok"}
 
 
+@app.post("/api/auth/login")
+def login(body: dict):
+    import os
+    email = body.get("email", "").strip().lower()
+    password = body.get("password", "")
+    expected_email = os.getenv("LOGIN_EMAIL", "").strip().lower()
+    expected_password = os.getenv("LOGIN_PASSWORD", "")
+    expected_token = os.getenv("LOGIN_CLIENT_TOKEN", "")
+    if email != expected_email or password != expected_password:
+        raise HTTPException(status_code=401, detail="Credenciales incorrectas")
+    return {"token": expected_token}
+
+
 @app.get("/api/health")
 def health():
     return {"status": "ok", "google_places_configured": bool(places.GOOGLE_API_KEY)}

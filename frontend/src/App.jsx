@@ -5,30 +5,58 @@ import PipelinePage from "./pages/PipelinePage";
 import { clearClientToken, getClientToken, getHealth, setClientToken } from "./api";
 import Icon from "./components/Icon";
 
-function AccessGate({ onAccess }) {
-  const [token, setToken] = useState("");
+const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
-  function handleSubmit(e) {
+function AccessGate({ onAccess }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (!token.trim()) return;
-    setClientToken(token.trim());
-    onAccess();
+    if (!email.trim() || !password.trim()) return;
+    setLoading(true);
+    setError("");
+    try {
+      const resp = await fetch(`${BASE_URL.replace("/api", "")}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
+      if (!resp.ok) {
+        setError("Usuario o contraseña incorrectos.");
+        return;
+      }
+      const data = await resp.json();
+      setClientToken(data.token);
+      onAccess();
+    } catch {
+      setError("No se pudo conectar al servidor.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <div className="access-gate">
       <form className="card" style={{ maxWidth: 380, width: "100%" }} onSubmit={handleSubmit}>
-        <h2 style={{ marginTop: 0 }}>Acceso</h2>
+        <h2 style={{ marginTop: 0 }}>Iniciar sesion</h2>
         <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>
-          Ingresa el token de acceso que te compartio tu agencia.
+          Ingresa tus credenciales para acceder.
         </p>
+        {error && <div className="banner banner-danger" style={{ marginBottom: 12 }}>{error}</div>}
         <div className="field">
-          <label htmlFor="token">Token de acceso</label>
-          <input id="token" value={token} onChange={(e) => setToken(e.target.value)} placeholder="Pega tu token aqui" />
+          <label htmlFor="email">Correo electronico</label>
+          <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" autoComplete="email" />
+        </div>
+        <div className="field">
+          <label htmlFor="password">Contrasena</label>
+          <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" autoComplete="current-password" />
         </div>
         <div style={{ marginTop: 16 }}>
-          <button className="btn" type="submit">
-            Entrar
+          <button className="btn" type="submit" disabled={loading}>
+            {loading ? "Entrando..." : "Entrar"}
           </button>
         </div>
       </form>
