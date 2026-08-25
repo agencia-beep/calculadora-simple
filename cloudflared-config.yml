@@ -1,0 +1,7 @@
+﻿tunnel: 69bf37d3-ffbf-45ce-904c-6dbd920ff4ab
+credentials-file: C:\Users\jcvar\.cloudflared\69bf37d3-ffbf-45ce-904c-6dbd920ff4ab.json
+
+ingress:
+  - hostname: leadfinder-api.agenciashopservices.com
+    service: http://127.0.0.1:8000
+  - service: http_status:404
