@@ -130,3 +130,56 @@ class SavedSearchOut(SavedSearchCreate):
 
     class Config:
         from_attributes = True
+
+
+# ── Sequences ──────────────────────────────────────────
+
+class SequenceStepCreate(BaseModel):
+    step_number: int
+    day_offset: int
+    action_type: str  # whatsapp | email | call | note
+    message_template: Optional[str] = None
+
+
+class SequenceStepOut(SequenceStepCreate):
+    id: int
+    sequence_id: int
+
+    class Config:
+        from_attributes = True
+
+
+class SequenceCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    steps: list[SequenceStepCreate] = []
+
+
+class SequenceOut(BaseModel):
+    id: int
+    name: str
+    description: Optional[str]
+    created_at: datetime
+    steps: list[SequenceStepOut] = []
+
+    class Config:
+        from_attributes = True
+
+
+class SequenceEnrollmentOut(BaseModel):
+    id: int
+    sequence_id: int
+    lead_id: int
+    current_step: int
+    status: str
+    enrolled_at: datetime
+    next_action_at: Optional[datetime]
+    sequence_name: Optional[str] = None
+    lead_name: Optional[str] = None
+    lead_phone: Optional[str] = None
+    lead_email: Optional[str] = None
+    action_type: Optional[str] = None
+    message_template: Optional[str] = None
+
+    class Config:
+        from_attributes = True

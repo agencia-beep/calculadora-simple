@@ -163,3 +163,42 @@ export async function getLeadActivity(leadId) {
   const resp = await request(`/leads/${leadId}/activity`);
   return resp.json();
 }
+// ── Sequences ─────────────────────────────────────────
+
+export async function getSequences() {
+  const resp = await request("/sequences");
+  return resp.json();
+}
+
+export async function createSequence(payload) {
+  const resp = await request("/sequences", { method: "POST", body: JSON.stringify(payload) });
+  return resp.json();
+}
+
+export async function deleteSequence(id) {
+  await request(`/sequences/${id}`, { method: "DELETE" });
+}
+
+export async function enrollLead(sequenceId, leadId) {
+  const resp = await request(`/sequences/${sequenceId}/enroll/${leadId}`, { method: "POST" });
+  return resp.json();
+}
+
+export async function getDueEnrollments() {
+  const resp = await request("/sequences/enrollments/due");
+  return resp.json();
+}
+
+export async function getLeadEnrollments(leadId) {
+  const resp = await request(`/sequences/enrollments/lead/${leadId}`);
+  return resp.json();
+}
+
+export async function advanceEnrollment(enrollmentId) {
+  const resp = await request(`/sequences/enrollments/${enrollmentId}/advance`, { method: "POST" });
+  return resp.json();
+}
+
+export async function stopEnrollment(enrollmentId) {
+  await request(`/sequences/enrollments/${enrollmentId}/stop`, { method: "POST" });
+}

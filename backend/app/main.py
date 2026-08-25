@@ -19,7 +19,7 @@ from .auth import generate_token, get_current_client, require_admin
 from .database import Base, engine, get_db
 from .demo_site import generate_demo_for_lead
 from .export_excel import build_excel
-from .models import Client, Lead, LeadActivity, LeadNote, SavedSearch
+from .models import Client, Lead, LeadActivity, LeadNote, SavedSearch, Sequence, SequenceStep, SequenceEnrollment
 from .niche_presets import get_category_for_niche, get_grouped_niches
 from .schemas import (
     ClientCreate,
@@ -34,6 +34,9 @@ from .schemas import (
     SavedSearchCreate,
     SavedSearchOut,
     SearchRequest,
+    SequenceCreate,
+    SequenceOut,
+    SequenceEnrollmentOut,
 )
 
 Base.metadata.create_all(bind=engine)
@@ -549,6 +552,194 @@ async def run_saved_search(saved_id: int, client: Client = Depends(get_current_c
     db.commit()
 
     return leads
+
+
+# ── Sequences ──────────────────────────────────────────────────────────────
+
+@app.get("/api/sequences", response_model=list[SequenceOut])
+def list_sequences(client: Client = Depends(get_current_client), db: Session = Depends(get_db)):
+    seqs = db.query(Sequence).filter(Sequence.client_id == client.id).order_by(Sequence.created_at.desc()).all()
+    result = []
+    for s in seqs:
+        steps = db.query(SequenceStep).filter(SequenceStep.sequence_id == s.id).order_by(SequenceStep.step_number).all()
+        out = SequenceOut.model_validate(s)
+        out.steps = steps
+        result.append(out)
+    return result
+
+
+@app.post("/api/sequences", response_model=SequenceOut)
+def create_sequence(payload: SequenceCreate, client: Client = Depends(get_current_client), db: Session = Depends(get_db)):
+    seq = Sequence(client_id=client.id, name=payload.name, description=payload.description)
+    db.add(seq)
+    db.flush()
+    for step in payload.steps:
+        db.add(SequenceStep(sequence_id=seq.id, **step.model_dump()))
+    db.commit()
+    db.refresh(seq)
+    steps = db.query(SequenceStep).filter(SequenceStep.sequence_id == seq.id).order_by(SequenceStep.step_number).all()
+    out = SequenceOut.model_validate(seq)
+    out.steps = steps
+    return out
+
+
+@app.delete("/api/sequences/{seq_id}")
+def delete_sequence(seq_id: int, client: Client = Depends(get_current_client), db: Session = Depends(get_db)):
+    seq = db.query(Sequence).filter(Sequence.id == seq_id, Sequence.client_id == client.id).first()
+    if not seq:
+        raise HTTPException(status_code=404, detail="Secuencia no encontrada")
+    db.query(SequenceStep).filter(SequenceStep.sequence_id == seq_id).delete()
+    db.query(SequenceEnrollment).filter(SequenceEnrollment.sequence_id == seq_id).delete()
+    db.delete(seq)
+    db.commit()
+    return {"ok": True}
+
+
+@app.post("/api/sequences/{seq_id}/enroll/{lead_id}", response_model=SequenceEnrollmentOut)
+def enroll_lead(seq_id: int, lead_id: int, client: Client = Depends(get_current_client), db: Session = Depends(get_db)):
+    seq = db.query(Sequence).filter(Sequence.id == seq_id, Sequence.client_id == client.id).first()
+    if not seq:
+        raise HTTPException(status_code=404, detail="Secuencia no encontrada")
+    lead = db.query(Lead).filter(Lead.id == lead_id, Lead.client_id == client.id).first()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead no encontrado")
+
+    existing = db.query(SequenceEnrollment).filter(
+        SequenceEnrollment.sequence_id == seq_id,
+        SequenceEnrollment.lead_id == lead_id,
+        SequenceEnrollment.status == "active",
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="El lead ya esta inscrito en esta secuencia")
+
+    first_step = db.query(SequenceStep).filter(SequenceStep.sequence_id == seq_id).order_by(SequenceStep.step_number).first()
+    next_at = datetime.utcnow()
+    if first_step and first_step.day_offset > 0:
+        from datetime import timedelta
+        next_at = datetime.utcnow() + timedelta(days=first_step.day_offset)
+
+    enrollment = SequenceEnrollment(
+        sequence_id=seq_id, lead_id=lead_id, client_id=client.id,
+        current_step=1, status="active", next_action_at=next_at,
+    )
+    db.add(enrollment)
+    _log_activity(db, lead_id, "sequence_enrolled", f"Inscrito en secuencia '{seq.name}'")
+    db.commit()
+    db.refresh(enrollment)
+
+    out = SequenceEnrollmentOut.model_validate(enrollment)
+    out.sequence_name = seq.name
+    out.lead_name = lead.business_name
+    out.lead_phone = lead.phone
+    out.lead_email = lead.email
+    if first_step:
+        out.action_type = first_step.action_type
+        out.message_template = first_step.message_template
+    return out
+
+
+@app.get("/api/sequences/enrollments/due", response_model=list[SequenceEnrollmentOut])
+def enrollments_due(client: Client = Depends(get_current_client), db: Session = Depends(get_db)):
+    now = datetime.utcnow()
+    enrollments = db.query(SequenceEnrollment).filter(
+        SequenceEnrollment.client_id == client.id,
+        SequenceEnrollment.status == "active",
+        SequenceEnrollment.next_action_at <= now,
+    ).all()
+
+    result = []
+    for e in enrollments:
+        seq = db.query(Sequence).filter(Sequence.id == e.sequence_id).first()
+        lead = db.query(Lead).filter(Lead.id == e.lead_id).first()
+        step = db.query(SequenceStep).filter(
+            SequenceStep.sequence_id == e.sequence_id,
+            SequenceStep.step_number == e.current_step,
+        ).first()
+        out = SequenceEnrollmentOut.model_validate(e)
+        out.sequence_name = seq.name if seq else ""
+        out.lead_name = lead.business_name if lead else ""
+        out.lead_phone = lead.phone if lead else None
+        out.lead_email = lead.email if lead else None
+        out.action_type = step.action_type if step else None
+        out.message_template = step.message_template if step else None
+        result.append(out)
+    return result
+
+
+@app.get("/api/sequences/enrollments/lead/{lead_id}", response_model=list[SequenceEnrollmentOut])
+def lead_enrollments(lead_id: int, client: Client = Depends(get_current_client), db: Session = Depends(get_db)):
+    lead = db.query(Lead).filter(Lead.id == lead_id, Lead.client_id == client.id).first()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead no encontrado")
+    enrollments = db.query(SequenceEnrollment).filter(
+        SequenceEnrollment.lead_id == lead_id,
+        SequenceEnrollment.client_id == client.id,
+    ).order_by(SequenceEnrollment.enrolled_at.desc()).all()
+    result = []
+    for e in enrollments:
+        seq = db.query(Sequence).filter(Sequence.id == e.sequence_id).first()
+        step = db.query(SequenceStep).filter(
+            SequenceStep.sequence_id == e.sequence_id,
+            SequenceStep.step_number == e.current_step,
+        ).first()
+        out = SequenceEnrollmentOut.model_validate(e)
+        out.sequence_name = seq.name if seq else ""
+        out.lead_name = lead.business_name
+        out.action_type = step.action_type if step else None
+        out.message_template = step.message_template if step else None
+        result.append(out)
+    return result
+
+
+@app.post("/api/sequences/enrollments/{enrollment_id}/advance")
+def advance_enrollment(enrollment_id: int, client: Client = Depends(get_current_client), db: Session = Depends(get_db)):
+    from datetime import timedelta
+    e = db.query(SequenceEnrollment).filter(
+        SequenceEnrollment.id == enrollment_id,
+        SequenceEnrollment.client_id == client.id,
+    ).first()
+    if not e:
+        raise HTTPException(status_code=404, detail="Inscripcion no encontrada")
+
+    current_step = db.query(SequenceStep).filter(
+        SequenceStep.sequence_id == e.sequence_id,
+        SequenceStep.step_number == e.current_step,
+    ).first()
+
+    lead = db.query(Lead).filter(Lead.id == e.lead_id).first()
+    seq = db.query(Sequence).filter(Sequence.id == e.sequence_id).first()
+    if current_step and lead and seq:
+        _log_activity(db, e.lead_id, "sequence_step_done",
+            f"Paso {e.current_step} completado en '{seq.name}': {current_step.action_type}")
+
+    next_step = db.query(SequenceStep).filter(
+        SequenceStep.sequence_id == e.sequence_id,
+        SequenceStep.step_number == e.current_step + 1,
+    ).first()
+
+    if next_step:
+        e.current_step = next_step.step_number
+        e.next_action_at = datetime.utcnow() + timedelta(days=next_step.day_offset)
+    else:
+        e.status = "completed"
+        if lead and seq:
+            _log_activity(db, e.lead_id, "sequence_completed", f"Secuencia '{seq.name}' completada")
+
+    db.commit()
+    return {"ok": True, "status": e.status, "next_step": next_step.step_number if next_step else None}
+
+
+@app.post("/api/sequences/enrollments/{enrollment_id}/stop")
+def stop_enrollment(enrollment_id: int, client: Client = Depends(get_current_client), db: Session = Depends(get_db)):
+    e = db.query(SequenceEnrollment).filter(
+        SequenceEnrollment.id == enrollment_id,
+        SequenceEnrollment.client_id == client.id,
+    ).first()
+    if not e:
+        raise HTTPException(status_code=404, detail="Inscripcion no encontrada")
+    e.status = "stopped"
+    db.commit()
+    return {"ok": True}
 
 
 # Servir el frontend React (debe ir al final para no pisar las rutas /api/*)

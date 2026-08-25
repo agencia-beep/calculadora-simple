@@ -101,3 +101,37 @@ class LeadActivity(Base):
     # created | status_change | note_added | follow_up_set | demo_generated | messages_generated
     description = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Sequence(Base):
+    __tablename__ = "sequences"
+
+    id = Column(Integer, primary_key=True, index=True)
+    client_id = Column(Integer, ForeignKey("clients.id"), index=True, nullable=False)
+    name = Column(String, nullable=False)
+    description = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class SequenceStep(Base):
+    __tablename__ = "sequence_steps"
+
+    id = Column(Integer, primary_key=True, index=True)
+    sequence_id = Column(Integer, ForeignKey("sequences.id"), index=True, nullable=False)
+    step_number = Column(Integer, nullable=False)
+    day_offset = Column(Integer, nullable=False)  # days after enrollment (or after previous step)
+    action_type = Column(String, nullable=False)  # whatsapp | email | call | note
+    message_template = Column(Text)  # optional custom message
+
+
+class SequenceEnrollment(Base):
+    __tablename__ = "sequence_enrollments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    sequence_id = Column(Integer, ForeignKey("sequences.id"), index=True, nullable=False)
+    lead_id = Column(Integer, ForeignKey("leads.id"), index=True, nullable=False)
+    client_id = Column(Integer, ForeignKey("clients.id"), index=True, nullable=False)
+    current_step = Column(Integer, default=1)
+    status = Column(String, default="active")  # active | paused | completed | stopped
+    enrolled_at = Column(DateTime, default=datetime.utcnow)
+    next_action_at = Column(DateTime, nullable=True)
