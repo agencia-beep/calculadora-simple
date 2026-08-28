@@ -129,6 +129,15 @@ export async function deleteSavedSearch(id) {
   await request(`/saved-searches/${id}`, { method: "DELETE" });
 }
 
+export async function updateSavedSearchFrequency(id, frequency) {
+  const resp = await request(`/saved-searches/${id}/frequency`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ frequency }),
+  });
+  return resp.json();
+}
+
 export async function runSavedSearch(id) {
   const resp = await request(`/saved-searches/${id}/run`, { method: "POST" });
   return resp.json();

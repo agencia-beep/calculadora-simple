@@ -45,6 +45,12 @@ class LeadOut(BaseModel):
     email_message: Optional[str]
     call_script: Optional[str]
     demo_slug: Optional[str]
+    facebook_url: Optional[str] = None
+    instagram_url: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    owner_name: Optional[str] = None
+    detected_language: Optional[str] = None
+    marketing_gaps: Optional[str] = None
     next_follow_up: Optional[datetime]
     created_at: datetime
     is_new: bool = False

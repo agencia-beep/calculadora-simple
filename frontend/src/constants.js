@@ -22,6 +22,7 @@ export const PRIORITY_BADGE = {
 
 export const CONTACT_STATUS_OPTIONS = [
   "No contactado",
+  "Por llamar",
   "Contactado",
   "Reunion agendada",
   "Cerrado",

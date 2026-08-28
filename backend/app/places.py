@@ -12,6 +12,22 @@ import httpx
 
 EMAIL_REGEX = re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
 EMAIL_FILE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp")
+EMAIL_TRACKING_DOMAINS = ("sentry.io", "wixpress.com", "squarespace.com", "mailchimp.com",
+                          "sendgrid.net", "mandrillapp.com", "klaviyo.com", "constantcontact.com")
+HEX_RE = re.compile(r"^[0-9a-f]{16,}$")  # local part parece hash hex
+
+
+def _is_real_email(email: str) -> bool:
+    local, _, domain = email.partition("@")
+    if len(local) > 40:
+        return False
+    if HEX_RE.match(local.lower()):
+        return False
+    if any(t in domain.lower() for t in EMAIL_TRACKING_DOMAINS):
+        return False
+    if any(c in local for c in ("=", "+", "/")):
+        return False
+    return True
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY", "")
 
@@ -107,10 +123,59 @@ async def get_place_details(place_id: str) -> dict:
     return data.get("result", {})
 
 
+LANG_ATTR = re.compile(r'<html[^>]+lang=["\']([a-zA-Z-]{2,10})["\']', re.IGNORECASE)
+
+SOCIAL_PATTERNS = {
+    "facebook_url": re.compile(r'https?://(?:www\.)?facebook\.com/(?!sharer|share|dialog|plugins|photo|video|watch|story|events|groups|pages/create)[^\s"\'<>?#]{3,}', re.IGNORECASE),
+    "instagram_url": re.compile(r'https?://(?:www\.)?instagram\.com/(?!p/|reel/|explore/|accounts/)[^\s"\'<>?#/]{2,}(?:/)?', re.IGNORECASE),
+    "linkedin_url": re.compile(r'https?://(?:www\.)?linkedin\.com/(?:in|company)/[^\s"\'<>?#/]{3,}(?:/)?', re.IGNORECASE),
+}
+
+OWNER_PATTERNS = [
+    re.compile(r'(?:Dr\.?|Dra\.?)\s+([A-Z][a-z]+ [A-Z][a-z]+)', re.UNICODE),
+    re.compile(r'(?:Owner|Founder|CEO|Director|President|Manager|Propietario|Dueno|Dueño|Gerente|Director General)[:\s,]+([A-Z][a-z]+ [A-Z][a-z]+)', re.UNICODE),
+    re.compile(r'"(?:author|founder|owner)":\s*"([^"]{5,60})"', re.IGNORECASE),
+    re.compile(r'"name":\s*"([A-Z][a-z]+ [A-Z][a-z]+)"', re.UNICODE),
+]
+
+
+def _extract_social_links(html: str) -> dict:
+    links: dict = {}
+    for key, pat in SOCIAL_PATTERNS.items():
+        m = pat.search(html)
+        if m:
+            raw = m.group(0).rstrip("/")
+            # Descartar URLs genéricas de sharing/plugins
+            if any(junk in raw.lower() for junk in ["share", "sharer", "login", "signup", "intent", "privacy", "terms", "help", "about", "ads", "business"]):
+                continue
+            links[key] = raw
+    return links
+
+
+def _extract_owner_name(html: str) -> str | None:
+    clean = re.sub(r"<[^>]+>", " ", html)
+    for pat in OWNER_PATTERNS:
+        m = pat.search(clean)
+        if m:
+            name = m.group(1).strip()
+            # Filtrar falsos positivos (palabras genéricas, muy cortas)
+            if len(name) > 5 and not any(w in name.lower() for w in ["privacy", "cookie", "terms", "copyright", "website"]):
+                return name
+    return None
+
+
 async def analyze_website(url: str) -> dict:
-    """Hace una peticion al sitio para extraer email de contacto, medir velocidad
-    de carga y detectar senales basicas de SEO (titulo, meta description, viewport, HTTPS)."""
-    result: dict = {"email": None, "load_time_ms": None, "seo_notes": ""}
+    """Hace una peticion al sitio para extraer email, velocidad, SEO y redes sociales."""
+    result: dict = {
+        "email": None,
+        "load_time_ms": None,
+        "seo_notes": "",
+        "facebook_url": None,
+        "instagram_url": None,
+        "linkedin_url": None,
+        "owner_name": None,
+        "detected_language": None,
+    }
     if not url:
         return result
 
@@ -123,7 +188,7 @@ async def analyze_website(url: str) -> dict:
 
         emails = [
             e for e in EMAIL_REGEX.findall(html)
-            if not e.lower().endswith(EMAIL_FILE_EXTENSIONS)
+            if not e.lower().endswith(EMAIL_FILE_EXTENSIONS) and _is_real_email(e)
         ]
         if emails:
             result["email"] = emails[0]
@@ -150,6 +215,15 @@ async def analyze_website(url: str) -> dict:
             notes.append("Sin meta description")
 
         result["seo_notes"] = "; ".join(notes)
+
+        social = _extract_social_links(html)
+        result.update(social)
+
+        result["owner_name"] = _extract_owner_name(html)
+
+        lang_m = LANG_ATTR.search(html[:2000])
+        if lang_m:
+            result["detected_language"] = lang_m.group(1).lower()
     except Exception:
         result["seo_notes"] = "No se pudo analizar el sitio"
 

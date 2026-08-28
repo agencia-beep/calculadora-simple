@@ -605,6 +605,161 @@ tr:hover td {
   border-left: 3px solid var(--color-primary);
 }
 
+/* ---------- Lead List (acordeón) ---------- */
+.lead-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.lead-card {
+  border-bottom: 1px solid var(--color-border);
+  transition: background 0.1s;
+}
+
+.lead-card:last-child {
+  border-bottom: none;
+}
+
+.lead-card-new .lead-card-header {
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.lead-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+
+.lead-card-header:hover {
+  background: var(--color-muted-bg);
+}
+
+.lead-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.lead-card-name {
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lead-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.lead-card-niche {
+  background: var(--color-muted-bg);
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.lead-card-sep {
+  opacity: 0.4;
+}
+
+.lead-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Panel expandido */
+.lead-card-body {
+  padding: 0 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.lead-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px 16px;
+  padding-top: 12px;
+}
+
+.lead-card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.lc-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lead-card-socials {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.social-link.linkedin { color: #0077b5; border-color: #bfdbfe; background: #eff6ff; }
+.social-link.facebook { color: #1877f2; border-color: #bfdbfe; background: #eff6ff; }
+.social-link.instagram { color: #e1306c; border-color: #fce7f3; background: #fdf2f8; }
+
+.lead-card-seo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lead-card-gaps {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lead-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+  flex-wrap: wrap;
+}
+
 /* ---------- Pipeline (Kanban) ---------- */
 .pipeline-board {
   display: flex;

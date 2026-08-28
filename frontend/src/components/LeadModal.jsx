@@ -123,7 +123,14 @@ export default function LeadModal({ lead, onClose, onUpdated }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h3>{current.business_name}</h3>
+        <h3 style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          {current.business_name}
+          {current.detected_language && !current.detected_language.startsWith("es") && (
+            <span title={`Sitio web en: ${current.detected_language}`} style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 999, background: "#fef3c7", color: "#92400e", border: "1px solid #fbbf24" }}>
+              🌐 Web en {current.detected_language.toUpperCase()}
+            </span>
+          )}
+        </h3>
         <p style={{ color: "var(--color-text-muted)", marginTop: -8, fontSize: 13 }}>
           {current.niche} · {current.city} · Score {current.score} ({current.priority})
         </p>
@@ -161,6 +168,32 @@ export default function LeadModal({ lead, onClose, onUpdated }) {
               <a href={current.maps_url} target="_blank" rel="noreferrer">Ver en Google Maps</a>
             </div>
           )}
+          {current.owner_name && (
+            <div className="lead-info-item">
+              <Icon name="user" size={14} />
+              <span style={{ fontWeight: 500 }}>{current.owner_name}</span>
+            </div>
+          )}
+          {(current.linkedin_url || current.facebook_url || current.instagram_url) && (
+            <div className="lead-info-item" style={{ gap: 10 }}>
+              <Icon name="externalLink" size={14} />
+              {current.linkedin_url && (
+                <a href={current.linkedin_url} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#0077b5" }}>
+                  <Icon name="linkedin" size={15} /> LinkedIn
+                </a>
+              )}
+              {current.facebook_url && (
+                <a href={current.facebook_url} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#1877f2" }}>
+                  <Icon name="facebook" size={15} /> Facebook
+                </a>
+              )}
+              {current.instagram_url && (
+                <a href={current.instagram_url} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#e1306c" }}>
+                  <Icon name="instagram" size={15} /> Instagram
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="modal-tabs">
@@ -177,6 +210,31 @@ export default function LeadModal({ lead, onClose, onUpdated }) {
 
         {tab === "mensajes" && (
           <>
+            {current.marketing_gaps && (() => {
+              let gaps = [];
+              try { gaps = JSON.parse(current.marketing_gaps); } catch {}
+              if (!gaps.length) return null;
+              const URGENCY_COLOR = { alta: "#ef4444", media: "#f59e0b", baja: "#6b7280" };
+              const URGENCY_LABEL = { alta: "Urgente", media: "Importante", baja: "Opcional" };
+              return (
+                <div className="modal-section" style={{ paddingBottom: 0 }}>
+                  <h4 style={{ marginBottom: 10 }}>Oportunidades de marketing detectadas</h4>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}>
+                    {gaps.map((g) => (
+                      <div key={g.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, background: "var(--color-muted-bg)", borderLeft: `3px solid ${URGENCY_COLOR[g.urgency] || "#6b7280"}` }}>
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: 13, fontWeight: 500 }}>{g.label}</span>
+                          <span style={{ fontSize: 12, color: "var(--color-text-muted)", marginLeft: 8 }}>→ {g.service}</span>
+                        </div>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: URGENCY_COLOR[g.urgency], whiteSpace: "nowrap" }}>
+                          {URGENCY_LABEL[g.urgency]}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
             <div className="modal-section">
               <h4>Diagnostico breve</h4>
               <pre>{current.diagnosis || "Genera los mensajes para crear un diagnostico."}</pre>

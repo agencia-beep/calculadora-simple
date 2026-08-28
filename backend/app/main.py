@@ -1,5 +1,6 @@
 import csv
 import io
+import json
 from datetime import datetime
 
 from dotenv import load_dotenv
@@ -131,11 +132,21 @@ async def run_search(req: SearchRequest, client_id: int, db: Session) -> list[Le
             email = None
             page_speed_ms = None
             seo_notes = ""
+            facebook_url = None
+            instagram_url = None
+            linkedin_url = None
+            owner_name = None
+            detected_language = None
             if website and website_status_final in ("tiene_website", "website_deficiente"):
                 analysis = await places.analyze_website(website)
                 email = analysis["email"]
                 page_speed_ms = analysis["load_time_ms"]
                 seo_notes = analysis["seo_notes"]
+                facebook_url = analysis.get("facebook_url")
+                instagram_url = analysis.get("instagram_url")
+                linkedin_url = analysis.get("linkedin_url")
+                owner_name = analysis.get("owner_name")
+                detected_language = analysis.get("detected_language")
 
             rating = details.get("rating") or item.get("rating")
             reviews_count = details.get("user_ratings_total") or item.get("user_ratings_total") or 0
@@ -148,23 +159,54 @@ async def run_search(req: SearchRequest, client_id: int, db: Session) -> list[Le
             score = 0
             priority = "Baja"
             diagnosis = ""
+            marketing_gaps_json = None
+
+            # Detectar si hay mismatch de idioma (buscamos en español pero el sitio es en inglés)
+            language_mismatch = (
+                req.language == "es"
+                and detected_language is not None
+                and not detected_language.startswith("es")
+            )
 
             if website_status_final != "no_prospecto":
-                score = scoring.calculate_score(
+                # Descartar negocios que ya tienen presencia digital muy completa
+                already_covered = scoring.is_already_covered(
                     website_status=website_status_final,
-                    rating=rating,
-                    reviews_count=reviews_count,
-                    phone=phone,
-                    niche=req.niche,
-                    city=city_for_leads,
-                )
-                priority = scoring.priority_from_score(score)
-                diagnosis = scoring.build_diagnosis(
-                    business_name=details.get("name") or item.get("name", ""),
-                    website_status=website_status_final,
+                    facebook_url=facebook_url,
+                    instagram_url=instagram_url,
+                    seo_notes=seo_notes,
                     rating=rating,
                     reviews_count=reviews_count,
                 )
+                if already_covered:
+                    website_status_final = "no_prospecto"
+                else:
+                    score = scoring.calculate_score(
+                        website_status=website_status_final,
+                        rating=rating,
+                        reviews_count=reviews_count,
+                        phone=phone,
+                        niche=req.niche,
+                        city=city_for_leads,
+                    )
+                    priority = scoring.priority_from_score(score)
+                    diagnosis = scoring.build_diagnosis(
+                        business_name=details.get("name") or item.get("name", ""),
+                        website_status=website_status_final,
+                        rating=rating,
+                        reviews_count=reviews_count,
+                    )
+                    gaps = scoring.build_marketing_gaps(
+                        website_status=website_status_final,
+                        seo_notes=seo_notes,
+                        facebook_url=facebook_url,
+                        instagram_url=instagram_url,
+                        email=email,
+                        rating=rating,
+                        reviews_count=reviews_count,
+                        language_mismatch=language_mismatch,
+                    )
+                    marketing_gaps_json = json.dumps(gaps, ensure_ascii=False) if gaps else None
 
             lead = db.query(Lead).filter(Lead.client_id == client_id, Lead.place_id == place_id).first()
             is_new_lead = lead is None
@@ -194,6 +236,12 @@ async def run_search(req: SearchRequest, client_id: int, db: Session) -> list[Le
             lead.score = score
             lead.priority = priority
             lead.diagnosis = diagnosis
+            lead.facebook_url = facebook_url
+            lead.instagram_url = instagram_url
+            lead.linkedin_url = linkedin_url
+            lead.owner_name = owner_name
+            lead.detected_language = detected_language
+            lead.marketing_gaps = marketing_gaps_json
             lead.updated_at = datetime.utcnow()
             if not lead.contact_status:
                 lead.contact_status = "No contactado"

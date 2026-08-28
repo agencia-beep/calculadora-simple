@@ -10,6 +10,7 @@ import {
   runSavedSearch,
   searchLeads,
   updateContactStatus,
+  updateSavedSearchFrequency,
 } from "../api";
 import SearchForm from "../components/SearchForm";
 import LeadsTable from "../components/LeadsTable";
@@ -25,6 +26,7 @@ export default function LeadsPage() {
   const [lastForm, setLastForm] = useState(null);
   const [sinceDate, setSinceDate] = useState("");
   const [nicheFilter, setNicheFilter] = useState("");
+  const [hideInPipeline, setHideInPipeline] = useState(true);
 
   useEffect(() => {
     refresh();
@@ -94,6 +96,15 @@ export default function LeadsPage() {
     }
   }
 
+  async function handleFrequencyChange(id, frequency) {
+    try {
+      const updated = await updateSavedSearchFrequency(id, frequency);
+      setSavedSearches((prev) => prev.map((s) => (s.id === id ? { ...s, ...updated } : s)));
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   function handleSinceChange(value) {
     setSinceDate(value);
     refresh(value);
@@ -124,7 +135,12 @@ export default function LeadsPage() {
   }
 
   const uniqueNiches = [...new Set(leads.map((l) => l.niche).filter(Boolean))].sort();
-  const filteredLeads = nicheFilter ? leads.filter((l) => l.niche === nicheFilter) : leads;
+  const filteredLeads = leads.filter((l) => {
+    if (nicheFilter && l.niche !== nicheFilter) return false;
+    if (hideInPipeline && l.contact_status !== "No contactado") return false;
+    return true;
+  });
+  const inPipelineCount = leads.filter((l) => l.contact_status !== "No contactado").length;
 
   return (
     <div>
@@ -136,64 +152,56 @@ export default function LeadsPage() {
       {error && (
         <div className="banner banner-danger" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span>{error}</span>
-          <button onClick={() => setError("")} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", display: "inline-flex", padding: 0 }} title="Cerrar">
+          <button onClick={() => setError("")} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", display: "inline-flex", padding: 0 }}>
             <Icon name="x" size={16} />
           </button>
         </div>
       )}
 
-      {savedSearches.length > 0 && (
-        <div className="card" style={{ marginBottom: 20 }}>
-          <h4 style={{ marginTop: 0 }}>Busquedas guardadas</h4>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {savedSearches.map((s) => (
-              <div key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                <div>
-                  <strong>{s.name}</strong>{" "}
-                  <span style={{ color: "var(--color-text-muted)", fontSize: 13 }}>
-                    {s.niche} · {s.city || s.zip_code} {s.country}
-                  </span>
-                  {s.last_run_at && (
-                    <span style={{ color: "var(--color-text-muted)", fontSize: 12 }}>
-                      {" "}
-                      · ultima vez: {new Date(s.last_run_at).toLocaleString()}
-                    </span>
-                  )}
-                </div>
-                <div style={{ display: "flex", gap: 6 }}>
-                  <button className="btn btn-secondary btn-small" onClick={() => handleRunSavedSearch(s.id)} disabled={loading}>
-                    <Icon name="zap" size={14} /> Buscar ahora
-                  </button>
-                  <button className="btn btn-secondary btn-small btn-icon" onClick={() => handleDeleteSavedSearch(s.id)} title="Eliminar">
-                    <Icon name="trash" size={14} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <SearchForm
+        onSearch={handleSearch}
+        onSaveSearch={handleSaveSearch}
+        loading={loading}
+        savedSearches={savedSearches}
+        onRunSaved={handleRunSavedSearch}
+        onDeleteSaved={handleDeleteSavedSearch}
+        onFrequencyChange={handleFrequencyChange}
+      />
 
-      <SearchForm onSearch={handleSearch} onSaveSearch={handleSaveSearch} loading={loading} />
-
-      <div className="card" style={{ marginTop: 20 }}>
-        <div className="toolbar">
+      <div className="card" style={{ marginTop: 20, padding: 0, overflow: "hidden" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--color-border)", flexWrap: "wrap", gap: 10 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <strong>{filteredLeads.length} leads</strong>
+            <span style={{ fontWeight: 700, fontSize: 15 }}>{filteredLeads.length}</span>
+            <span style={{ color: "var(--color-text-muted)", fontSize: 14 }}>leads</span>
             {nicheFilter && (
               <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, background: "var(--color-primary)", color: "#fff", padding: "3px 6px 3px 10px", borderRadius: 999 }}>
                 {nicheFilter}
-                <button onClick={() => setNicheFilter("")} style={{ display: "inline-flex", color: "#fff", cursor: "pointer", border: "none", background: "none", padding: 0 }} title="Quitar filtro">
+                <button onClick={() => setNicheFilter("")} style={{ display: "inline-flex", color: "#fff", cursor: "pointer", border: "none", background: "none", padding: 0 }}>
                   <Icon name="x" size={13} />
                 </button>
               </span>
             )}
           </div>
-          <div className="toolbar-actions" style={{ alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <button
+              onClick={() => setHideInPipeline((v) => !v)}
+              style={{
+                height: 32, padding: "0 12px", borderRadius: 7, border: "1px solid var(--color-border)",
+                background: hideInPipeline ? "var(--color-primary)" : "var(--color-surface)",
+                color: hideInPipeline ? "#fff" : "var(--color-text-muted)",
+                cursor: "pointer", fontSize: 12, display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap", fontWeight: 500,
+              }}
+              title={hideInPipeline ? "Mostrando solo 'No contactado' — clic para ver todos" : "Mostrando todos — clic para ocultar los que están en pipeline"}
+            >
+              <Icon name="filter" size={12} />
+              {hideInPipeline
+                ? <>Solo nuevos {inPipelineCount > 0 && <span style={{ opacity: 0.8, marginLeft: 2 }}>({inPipelineCount} en pipeline)</span>}</>
+                : "Ver todos"}
+            </button>
             <select
               value={nicheFilter}
               onChange={(e) => setNicheFilter(e.target.value)}
-              style={{ fontSize: 13, padding: "4px 8px", borderRadius: 6, border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)", cursor: "pointer" }}
+              style={{ fontSize: 13, padding: "5px 10px", borderRadius: 7, border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)", cursor: "pointer" }}
             >
               <option value="">Todos los nichos</option>
               {uniqueNiches.map((n) => (
@@ -201,20 +209,18 @@ export default function LeadsPage() {
               ))}
             </select>
             <label style={{ fontSize: 13, color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 6 }}>
-              Nuevos desde
-              <input type="date" value={sinceDate} onChange={(e) => handleSinceChange(e.target.value)} />
+              Desde
+              <input type="date" value={sinceDate} onChange={(e) => handleSinceChange(e.target.value)} style={{ fontSize: 13 }} />
             </label>
-            <a className="btn btn-secondary" href={exportCsvUrl()} download>
-              <Icon name="download" size={14} /> CSV
+            <a className="btn btn-secondary" href={exportCsvUrl()} style={{ fontSize: 13, padding: "5px 12px" }}>
+              <Icon name="download" size={13} /> CSV
             </a>
-            <a className="btn btn-secondary" href={exportXlsxUrl()} download>
-              <Icon name="download" size={14} /> Excel
+            <a className="btn btn-secondary" href={exportXlsxUrl()} style={{ fontSize: 13, padding: "5px 12px" }}>
+              <Icon name="download" size={13} /> Excel
             </a>
           </div>
         </div>
-      </div>
 
-      <div style={{ marginTop: 20 }}>
         <LeadsTable
           leads={filteredLeads}
           onContactStatusChange={handleContactStatusChange}

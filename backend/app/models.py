@@ -77,6 +77,13 @@ class Lead(Base):
     call_script = Column(Text)
     demo_slug = Column(String)
 
+    facebook_url = Column(String, nullable=True)
+    instagram_url = Column(String, nullable=True)
+    linkedin_url = Column(String, nullable=True)
+    owner_name = Column(String, nullable=True)
+    detected_language = Column(String, nullable=True)
+    marketing_gaps = Column(Text, nullable=True)
+
     next_follow_up = Column(DateTime, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
