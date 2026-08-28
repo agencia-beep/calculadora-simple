@@ -96,30 +96,37 @@ export default function App() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <h1>LeadFinder</h1>
+        <div className="sidebar-top-bar">
+          <h1>LeadFinder</h1>
+          <div className="sidebar-footer" style={{ marginTop: 0, paddingTop: 0 }}>
+            <nav>
+              <button onClick={handleLogout} title="Cerrar sesion">
+                <Icon name="logout" size={16} />
+                <span className="sidebar-btn-label">Salir</span>
+              </button>
+            </nav>
+          </div>
+        </div>
         <div className="subtitle">Prospeccion de negocios locales</div>
         <nav>
           <div className="nav-label">Menu</div>
           <button className={page === "leads" ? "active" : ""} onClick={() => setPage("leads")}>
-            <Icon name="search" size={18} /> Buscar leads
+            <Icon name="search" size={16} />
+            <span className="sidebar-btn-label">Buscar leads</span>
           </button>
           <button className={page === "pipeline" ? "active" : ""} onClick={() => setPage("pipeline")}>
-            <Icon name="trendingUp" size={18} /> Pipeline
+            <Icon name="trendingUp" size={16} />
+            <span className="sidebar-btn-label">Pipeline</span>
           </button>
           <button className={page === "dashboard" ? "active" : ""} onClick={() => setPage("dashboard")}>
-            <Icon name="grid" size={18} /> Dashboard
+            <Icon name="grid" size={16} />
+            <span className="sidebar-btn-label">Dashboard</span>
           </button>
           <button className={page === "sequences" ? "active" : ""} onClick={() => setPage("sequences")}>
-            <Icon name="trendingUp" size={18} /> Secuencias
+            <Icon name="zap" size={16} />
+            <span className="sidebar-btn-label">Secuencias</span>
           </button>
         </nav>
-        <div className="sidebar-footer">
-          <nav>
-            <button onClick={handleLogout}>
-              <Icon name="logout" size={18} /> Cerrar sesion
-            </button>
-          </nav>
-        </div>
       </aside>
 
       <main className="main-content">

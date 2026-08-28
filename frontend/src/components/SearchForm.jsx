@@ -42,7 +42,7 @@ export default function SearchForm({ onSearch, onSaveSearch, loading, savedSearc
   return (
     <div className="card" style={{ padding: 0, overflow: "hidden" }}>
       <form onSubmit={handleSubmit}>
-        <div style={{ display: "flex", alignItems: "stretch", gap: 0, padding: "16px 20px", borderBottom: expanded ? "1px solid var(--color-border)" : "none" }}>
+        <div className="search-bar-row" style={{ borderBottom: expanded ? "1px solid var(--color-border)" : "none" }}>
           <div style={{ flex: 2, position: "relative" }}>
             <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--color-text-muted)", pointerEvents: "none" }}>
               <Icon name="search" size={15} />
@@ -63,7 +63,7 @@ export default function SearchForm({ onSearch, onSaveSearch, loading, savedSearc
             </datalist>
           </div>
 
-          <div style={{ width: 1, background: "var(--color-border)", margin: "0 12px" }} />
+          <div className="search-bar-sep" />
 
           <div style={{ flex: 1, position: "relative" }}>
             <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--color-text-muted)", pointerEvents: "none" }}>
@@ -78,7 +78,7 @@ export default function SearchForm({ onSearch, onSaveSearch, loading, savedSearc
             />
           </div>
 
-          <div style={{ width: 1, background: "var(--color-border)", margin: "0 12px" }} />
+          <div className="search-bar-sep" />
 
           <div style={{ flex: 1 }}>
             <input
@@ -91,7 +91,7 @@ export default function SearchForm({ onSearch, onSaveSearch, loading, savedSearc
             />
           </div>
 
-          <div style={{ display: "flex", gap: 8, marginLeft: 12 }}>
+          <div className="search-bar-actions">
             <button
               type="button"
               onClick={() => setExpanded((v) => !v)}

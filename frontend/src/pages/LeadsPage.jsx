@@ -169,8 +169,8 @@ export default function LeadsPage() {
       />
 
       <div className="card" style={{ marginTop: 20, padding: 0, overflow: "hidden" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--color-border)", flexWrap: "wrap", gap: 10 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div className="leads-toolbar-bar">
+          <div className="leads-toolbar-left">
             <span style={{ fontWeight: 700, fontSize: 15 }}>{filteredLeads.length}</span>
             <span style={{ color: "var(--color-text-muted)", fontSize: 14 }}>leads</span>
             {nicheFilter && (
@@ -182,7 +182,7 @@ export default function LeadsPage() {
               </span>
             )}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <div className="leads-toolbar-right">
             <button
               onClick={() => setHideInPipeline((v) => !v)}
               style={{
@@ -212,10 +212,10 @@ export default function LeadsPage() {
               Desde
               <input type="date" value={sinceDate} onChange={(e) => handleSinceChange(e.target.value)} style={{ fontSize: 13 }} />
             </label>
-            <a className="btn btn-secondary" href={exportCsvUrl()} style={{ fontSize: 13, padding: "5px 12px" }}>
+            <a className="btn btn-secondary leads-export-btn" href={exportCsvUrl()} style={{ fontSize: 13, padding: "5px 12px" }}>
               <Icon name="download" size={13} /> CSV
             </a>
-            <a className="btn btn-secondary" href={exportXlsxUrl()} style={{ fontSize: 13, padding: "5px 12px" }}>
+            <a className="btn btn-secondary leads-export-btn" href={exportXlsxUrl()} style={{ fontSize: 13, padding: "5px 12px" }}>
               <Icon name="download" size={13} /> Excel
             </a>
           </div>
