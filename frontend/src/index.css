@@ -73,10 +73,12 @@ button {
 }
 
 .sidebar-logo {
-  max-width: 140px;
+  max-width: 150px;
   height: auto;
   display: block;
-  filter: brightness(0) invert(1);
+  background: #fff;
+  border-radius: 8px;
+  padding: 5px 10px;
 }
 
 .sidebar h1 {
@@ -978,8 +980,13 @@ tr:hover td {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px;
+    padding: 8px 14px;
     border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .sidebar-logo {
+    max-width: 110px;
+    padding: 3px 7px;
   }
 
   .sidebar h1 {
@@ -1162,16 +1169,28 @@ tr:hover td {
     justify-content: center;
   }
 
-  /* Pipeline */
+  /* Pipeline → carrusel horizontal en móvil */
   .pipeline-board {
-    flex-direction: column;
-    overflow-x: visible;
-    gap: 10px;
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    gap: 12px;
+    padding-bottom: 12px;
   }
 
+  .pipeline-board::-webkit-scrollbar { display: none; }
+
   .pipeline-column {
-    width: 100%;
+    min-width: 82vw;
+    max-width: 82vw;
+    scroll-snap-align: start;
+    flex-shrink: 0;
     max-height: none;
+  }
+
+  .pipeline-move-btn {
+    display: flex !important;
   }
 
   table {

@@ -214,6 +214,18 @@ export default function PipelinePage() {
                         </span>
                       )}
                     </div>
+                    {/* Selector de etapa — solo visible en móvil via CSS */}
+                    <select
+                      className="pipeline-move-btn"
+                      value={lead.contact_status}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) => moveLead(lead.id, e.target.value)}
+                      style={{ display: "none", marginTop: 8, width: "100%", fontSize: 12, padding: "5px 8px", borderRadius: 6, border: "1px solid var(--color-border)", background: "var(--color-bg)", color: "var(--color-text)", cursor: "pointer" }}
+                    >
+                      {CONTACT_STATUS_OPTIONS.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
                   </div>
                 ))}
               </div>
