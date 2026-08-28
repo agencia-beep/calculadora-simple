@@ -72,6 +72,13 @@ button {
   flex-direction: column;
 }
 
+.sidebar-logo {
+  max-width: 140px;
+  height: auto;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+
 .sidebar h1 {
   font-size: 17px;
   margin: 0 0 4px;

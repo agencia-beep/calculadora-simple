@@ -42,8 +42,10 @@ function AccessGate({ onAccess }) {
   return (
     <div className="access-gate">
       <form className="card" style={{ maxWidth: 380, width: "100%" }} onSubmit={handleSubmit}>
-        <h2 style={{ marginTop: 0 }}>Iniciar sesion</h2>
-        <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <img src="/logo.png" alt="Finder App" style={{ maxWidth: 180, height: "auto" }} />
+        </div>
+        <p style={{ color: "var(--color-text-muted)", fontSize: 14, marginTop: 0 }}>
           Ingresa tus credenciales para acceder.
         </p>
         {error && <div className="banner banner-danger" style={{ marginBottom: 12 }}>{error}</div>}
@@ -97,7 +99,7 @@ export default function App() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="sidebar-top-bar">
-          <h1>LeadFinder</h1>
+          <img src="/logo.png" alt="Finder App" className="sidebar-logo" />
           <div className="sidebar-footer" style={{ marginTop: 0, paddingTop: 0 }}>
             <nav>
               <button onClick={handleLogout} title="Cerrar sesion">
