@@ -177,6 +177,8 @@ button {
 /* ---------- Main content ---------- */
 .main-content {
   flex: 1;
+  min-width: 0;
+  overflow-x: hidden;
   padding: 32px 40px;
   max-width: 1440px;
 }
@@ -785,8 +787,18 @@ tr:hover td {
   display: flex;
   gap: 16px;
   overflow-x: auto;
-  padding-bottom: 8px;
+  padding-bottom: 16px;
+  padding-right: 40px;
   align-items: flex-start;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pipeline-board::-webkit-scrollbar {
+  height: 6px;
+}
+.pipeline-board::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
 }
 
 .pipeline-column {
