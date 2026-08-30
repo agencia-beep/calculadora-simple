@@ -3,6 +3,7 @@ import DashboardPage from "./pages/DashboardPage";
 import LeadsPage from "./pages/LeadsPage";
 import PipelinePage from "./pages/PipelinePage";
 import SequencesPage from "./pages/SequencesPage";
+import AgentPage from "./pages/AgentPage";
 import { clearClientToken, getClientToken, getHealth, setClientToken } from "./api";
 import Icon from "./components/Icon";
 
@@ -128,6 +129,10 @@ export default function App() {
             <Icon name="zap" size={16} />
             <span className="sidebar-btn-label">Secuencias</span>
           </button>
+          <button className={page === "agent" ? "active" : ""} onClick={() => setPage("agent")}>
+            <Icon name="cpu" size={16} />
+            <span className="sidebar-btn-label">Agente IA</span>
+          </button>
         </nav>
       </aside>
 
@@ -146,6 +151,7 @@ export default function App() {
         {page === "pipeline" && <PipelinePage />}
         {page === "dashboard" && <DashboardPage />}
         {page === "sequences" && <SequencesPage />}
+        {page === "agent" && <AgentPage />}
       </main>
     </div>
   );
