@@ -118,6 +118,19 @@ export default {
       }
     }
 
+    // ── Historial de ejecuciones (/history) ─────────────────────────────────
+    if (url.pathname === "/history" && request.method === "GET") {
+      const secret = request.headers.get("x-agent-secret");
+      if ((secret || "").trim() !== (env.AGENT_SECRET || "").trim()) {
+        return new Response("Unauthorized", { status: 401, headers: cors });
+      }
+      const raw = await env.AGENT_CONFIG.get("run_history");
+      const history = raw ? JSON.parse(raw) : [];
+      return new Response(JSON.stringify(history), {
+        headers: { "Content-Type": "application/json", ...cors },
+      });
+    }
+
     return new Response("Finder App — Agente IA", { status: 200 });
   },
 };
@@ -176,6 +189,25 @@ async function runAgent(env) {
     errors: errors.length,
     error_details: errors,
   };
+
+  // Guardar en historial (KV — últimas 50 ejecuciones)
+  if (env.AGENT_CONFIG) {
+    try {
+      const raw = await env.AGENT_CONFIG.get("run_history");
+      const history = raw ? JSON.parse(raw) : [];
+      history.unshift({
+        timestamp: result.timestamp,
+        sent: result.sent,
+        skipped: result.skipped,
+        errors: result.errors,
+        total: result.total,
+        ok: result.ok,
+      });
+      await env.AGENT_CONFIG.put("run_history", JSON.stringify(history.slice(0, 50)));
+    } catch (err) {
+      console.error("[Agent] Error guardando historial:", err.message);
+    }
+  }
 
   // Enviar reporte resumen al usuario
   try {

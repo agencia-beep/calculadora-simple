@@ -97,6 +97,7 @@ export default function AgentPage() {
   const [agentContext, setAgentContext] = useState("");
   const [contextSaving, setContextSaving] = useState(false);
   const [contextSaved, setContextSaved] = useState(false);
+  const [history, setHistory] = useState(null);
 
   const loadStats = useCallback(() => {
     agentFetch("/stats")
@@ -107,6 +108,7 @@ export default function AgentPage() {
   useEffect(() => {
     loadStats();
     agentFetch("/config").then((d) => setAgentContext(d.agent_context ?? "")).catch(() => {});
+    agentFetch("/history").then(setHistory).catch(() => setHistory([]));
   }, [loadStats]);
 
   async function handleSaveContext() {
@@ -131,6 +133,7 @@ export default function AgentPage() {
       const result = await agentFetch("/run");
       setRunResult(result);
       loadStats();
+      agentFetch("/history").then(setHistory).catch(() => {});
     } catch (e) {
       setError("Error al ejecutar el agente: " + e.message);
     } finally {
@@ -257,6 +260,52 @@ export default function AgentPage() {
                     ) : (
                       <span style={{ color: "var(--color-text-muted)", fontSize: 12 }}>Sin email</span>
                     )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* HISTORIAL DE EJECUCIONES */}
+      <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+        <div className="card-header">
+          <span className="card-title">Historial de ejecuciones</span>
+          <span className="badge">{history?.length ?? 0} registros</span>
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table className="leads-table">
+            <thead>
+              <tr>
+                <th>Fecha y hora</th>
+                <th>Emails enviados</th>
+                <th>Sin email</th>
+                <th>Errores</th>
+                <th>Total procesados</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history === null && (
+                <tr><td colSpan={6} style={{ textAlign: "center", padding: 24, color: "var(--color-text-muted)" }}>Cargando...</td></tr>
+              )}
+              {history?.length === 0 && (
+                <tr><td colSpan={6} style={{ textAlign: "center", padding: 24, color: "var(--color-text-muted)" }}>Aún no hay ejecuciones registradas</td></tr>
+              )}
+              {history?.map((run, i) => (
+                <tr key={i}>
+                  <td style={{ fontSize: 13, color: "var(--color-text-muted)", whiteSpace: "nowrap" }}>
+                    {new Date(run.timestamp).toLocaleString("es", { dateStyle: "short", timeStyle: "short" })}
+                  </td>
+                  <td style={{ fontWeight: 600, color: "var(--color-success, #22c55e)" }}>{run.sent}</td>
+                  <td style={{ color: "var(--color-text-muted)" }}>{run.skipped}</td>
+                  <td style={{ color: run.errors > 0 ? "var(--color-danger, #ef4444)" : "var(--color-text-muted)" }}>{run.errors}</td>
+                  <td style={{ color: "var(--color-text-muted)" }}>{run.total}</td>
+                  <td>
+                    <span className={`status-badge ${run.ok ? "status-badge--contacted" : "status-badge--new"}`}>
+                      {run.ok ? "OK" : "Error"}
+                    </span>
                   </td>
                 </tr>
               ))}
