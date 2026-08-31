@@ -15,6 +15,7 @@ export async function sendLeadEmail(env, lead, subject, body) {
     },
     body: JSON.stringify({
       from: clean(env.EMAIL_FROM),
+      reply_to: clean(env.REPLY_TO_EMAIL) || clean(env.EMAIL_FROM),
       to: [lead.email],
       subject,
       text: body,
