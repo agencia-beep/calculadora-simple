@@ -1,0 +1,11 @@
+name = "leadfinder-agent"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+[[kv_namespaces]]
+binding = "AGENT_CONFIG"
+id = "f4fd384a26024657a7429be23225ef7a"
+
+[triggers]
+crons = ["0 13 * * 1-5"]
+# Dispara lunes-viernes a las 8:00 AM Eastern (UTC-5 = 13:00 UTC)

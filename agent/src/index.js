@@ -16,7 +16,7 @@ export default {
     const cors = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Headers": "x-agent-secret, Content-Type",
-      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, PUT, OPTIONS",
     };
 
     // Preflight
@@ -57,6 +57,27 @@ export default {
         });
       } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { "Content-Type": "application/json" } });
+      }
+    }
+
+    // ── Configuración del agente (/config) ──────────────────────────────────
+    if (url.pathname === "/config") {
+      const secret = request.headers.get("x-agent-secret");
+      if ((secret || "").trim() !== (env.AGENT_SECRET || "").trim()) {
+        return new Response("Unauthorized", { status: 401, headers: cors });
+      }
+      if (request.method === "GET") {
+        const context = await env.AGENT_CONFIG.get("agent_context") ?? "";
+        return new Response(JSON.stringify({ agent_context: context }), {
+          headers: { "Content-Type": "application/json", ...cors },
+        });
+      }
+      if (request.method === "PUT") {
+        const body = await request.json();
+        await env.AGENT_CONFIG.put("agent_context", body.agent_context ?? "");
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { "Content-Type": "application/json", ...cors },
+        });
       }
     }
 

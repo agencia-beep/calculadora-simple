@@ -4,9 +4,10 @@ import { getClientToken } from "../api";
 const AGENT_URL = "https://leadfinder-agent.agenciashopservices.workers.dev";
 const AGENT_SECRET = "finder2025agent";
 
-function agentFetch(path) {
+function agentFetch(path, options = {}) {
   return fetch(`${AGENT_URL}${path}`, {
-    headers: { "x-agent-secret": AGENT_SECRET },
+    ...options,
+    headers: { "x-agent-secret": AGENT_SECRET, "Content-Type": "application/json", ...(options.headers || {}) },
   }).then((r) => r.json());
 }
 
@@ -93,6 +94,9 @@ export default function AgentPage() {
   const [runResult, setRunResult] = useState(null);
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState("");
+  const [agentContext, setAgentContext] = useState("");
+  const [contextSaving, setContextSaving] = useState(false);
+  const [contextSaved, setContextSaved] = useState(false);
 
   const loadStats = useCallback(() => {
     agentFetch("/stats")
@@ -102,7 +106,22 @@ export default function AgentPage() {
 
   useEffect(() => {
     loadStats();
+    agentFetch("/config").then((d) => setAgentContext(d.agent_context ?? "")).catch(() => {});
   }, [loadStats]);
+
+  async function handleSaveContext() {
+    setContextSaving(true);
+    setContextSaved(false);
+    try {
+      await agentFetch("/config", { method: "PUT", body: JSON.stringify({ agent_context: agentContext }) });
+      setContextSaved(true);
+      setTimeout(() => setContextSaved(false), 3000);
+    } catch (e) {
+      setError("Error guardando contexto: " + e.message);
+    } finally {
+      setContextSaving(false);
+    }
+  }
 
   async function handleRun() {
     setRunning(true);
@@ -243,6 +262,39 @@ export default function AgentPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* CONTEXTO EDITABLE */}
+      <div className="card agent-config-card">
+        <div className="card-header" style={{ borderBottom: "1px solid var(--color-border)", marginBottom: 14 }}>
+          <span className="card-title">Contexto del agente</span>
+          <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>
+            El agente leerá esto al generar cada email
+          </span>
+        </div>
+        <p style={{ fontSize: 13, color: "var(--color-text-muted)", marginTop: 0, marginBottom: 10 }}>
+          Agrega aquí el pitch actual de tu agencia, promociones del mes, casos de éxito recientes o cualquier contexto
+          que quieras que el agente use al redactar emails. Se aplica en la próxima ejecución sin redesplegar.
+        </p>
+        <textarea
+          className="agent-context-textarea"
+          value={agentContext}
+          onChange={(e) => setAgentContext(e.target.value)}
+          placeholder={`Ejemplo:\nEste mes tenemos una promoción: sitio web + Google Business Profile por $297/mes los primeros 3 meses.\nCaso de éxito: dentista en Orlando pasó de 5 a 40 reseñas en Google en 45 días.\nNo mencionar precios hasta la llamada de seguimiento.`}
+          rows={6}
+        />
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10 }}>
+          <button
+            className="btn"
+            onClick={handleSaveContext}
+            disabled={contextSaving}
+          >
+            {contextSaving ? "Guardando..." : "Guardar contexto"}
+          </button>
+          {contextSaved && (
+            <span style={{ color: "var(--color-success, #22c55e)", fontSize: 13 }}>✓ Guardado</span>
+          )}
         </div>
       </div>
 

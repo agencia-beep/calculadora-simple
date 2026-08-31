@@ -39,7 +39,8 @@ export async function generateEmail(env, lead) {
 
   const lang = lead.detected_language?.startsWith("en") ? "English" : "espanol";
 
-  const extraContext = clean(env.AGENT_CONTEXT);
+  const kvContext = env.AGENT_CONFIG ? await env.AGENT_CONFIG.get("agent_context") : null;
+  const extraContext = kvContext ?? clean(env.AGENT_CONTEXT);
   const userMsg = `
 Negocio: ${lead.business_name}
 Nicho: ${lead.niche}
