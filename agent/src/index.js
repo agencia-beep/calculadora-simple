@@ -13,16 +13,25 @@ export default {
   // ── Disparo manual via HTTP GET /run ────────────────────────────────────
   async fetch(request, env) {
     const url = new URL(request.url);
+    const cors = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "x-agent-secret, Content-Type",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+    };
+
+    // Preflight
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: cors });
+    }
 
     if (url.pathname === "/run" && request.method === "GET") {
-      // Protección básica con header secreto
       const secret = request.headers.get("x-agent-secret");
       if ((secret || "").trim() !== (env.AGENT_SECRET || "").trim()) {
-        return new Response("Unauthorized", { status: 401 });
+        return new Response("Unauthorized", { status: 401, headers: cors });
       }
       const result = await runAgent(env);
       return new Response(JSON.stringify(result, null, 2), {
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...cors },
       });
     }
 
