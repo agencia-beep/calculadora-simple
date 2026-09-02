@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 
 const CRM_URL = "https://leadfinder-crm.agenciashopservices.workers.dev";
 const CRM_SECRET = "crm2025secret";
+const CALL_URL = "https://leadfinder-call-agent.agenciashopservices.workers.dev";
+const CALL_SECRET = "call2025secret";
 
 const STAGES = [
   { key: "nuevo",       label: "Nuevo",        color: "#6366f1", bg: "#ede9fe" },
@@ -101,6 +103,8 @@ function LeadDetailPanel({ leadId, onClose, onSaved }) {
   const [lead, setLead] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [calling, setCalling] = useState(false);
+  const [callMsg, setCallMsg] = useState("");
   const [newNote, setNewNote] = useState("");
   const [addingNote, setAddingNote] = useState(false);
   const [tab, setTab] = useState("info"); // info | notes | activity
@@ -129,6 +133,26 @@ function LeadDetailPanel({ leadId, onClose, onSaved }) {
     } catch (e) {
       alert("Error: " + e.message);
     } finally { setSaving(false); }
+  }
+
+  async function handleCall() {
+    setCalling(true);
+    setCallMsg("");
+    try {
+      const res = await fetch(`${CALL_URL}/call/${leadId}`, {
+        method: "POST",
+        headers: { "x-call-secret": CALL_SECRET, "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error al llamar");
+      setCallMsg(`✅ Llamada iniciada al ${data.phone}`);
+      setTimeout(() => { setCallMsg(""); reload(); }, 4000);
+    } catch (e) {
+      setCallMsg(`❌ ${e.message}`);
+      setTimeout(() => setCallMsg(""), 4000);
+    } finally {
+      setCalling(false);
+    }
   }
 
   async function handleAddNote() {
@@ -214,7 +238,20 @@ function LeadDetailPanel({ leadId, onClose, onSaved }) {
               <textarea rows={3} value={field("deal_notes", lead.deal_notes)} onChange={(e) => setPatch({...patch, deal_notes: e.target.value})} placeholder="Observaciones, acuerdos, próximos pasos..." />
             </div>
 
-            <div className="crm-section-title" style={{ marginTop: 20 }}>Contacto</div>
+            <div className="crm-section-title" style={{ marginTop: 20 }}>
+              Contacto
+              {lead.phone && (
+                <button
+                  className="btn btn-sm"
+                  onClick={handleCall}
+                  disabled={calling}
+                  style={{ marginLeft: 12, fontSize: 12, padding: "3px 12px", background: "#10b981", borderColor: "#10b981" }}
+                >
+                  {calling ? "Llamando..." : "📞 Llamar con IA"}
+                </button>
+              )}
+              {callMsg && <span style={{ marginLeft: 10, fontSize: 12 }}>{callMsg}</span>}
+            </div>
             <div className="crm-info-grid">
               <InfoRow icon="📞" label="Teléfono" value={lead.phone} />
               <InfoRow icon="📧" label="Email" value={lead.email} />
@@ -313,6 +350,7 @@ function activityIcon(type) {
     email_sent: "📧", call_made: "📞", note_added: "📝",
     stage_changed: "🔀", followup_sent: "📩", responded: "💬",
     deal_created: "🤝", created: "✨",
+    call_initiated: "📲", call_completed: "✅",
   };
   return map[type] || "•";
 }
