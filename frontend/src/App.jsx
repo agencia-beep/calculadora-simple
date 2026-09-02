@@ -4,6 +4,7 @@ import LeadsPage from "./pages/LeadsPage";
 import PipelinePage from "./pages/PipelinePage";
 import SequencesPage from "./pages/SequencesPage";
 import AgentPage from "./pages/AgentPage";
+import CrmPage from "./pages/CrmPage";
 import { clearClientToken, getClientToken, getHealth, setClientToken } from "./api";
 import Icon from "./components/Icon";
 
@@ -133,6 +134,10 @@ export default function App() {
             <Icon name="cpu" size={16} />
             <span className="sidebar-btn-label">Agente IA</span>
           </button>
+          <button className={page === "crm" ? "active" : ""} onClick={() => setPage("crm")}>
+            <Icon name="trendingUp" size={16} />
+            <span className="sidebar-btn-label">CRM</span>
+          </button>
         </nav>
       </aside>
 
@@ -152,6 +157,7 @@ export default function App() {
         {page === "dashboard" && <DashboardPage />}
         {page === "sequences" && <SequencesPage />}
         {page === "agent" && <AgentPage />}
+        {page === "crm" && <CrmPage />}
       </main>
     </div>
   );

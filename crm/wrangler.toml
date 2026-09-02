@@ -1,0 +1,8 @@
+name = "leadfinder-crm"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "leadfinder-crm"
+database_id = "bb26ad1b-96f0-4a0a-9baa-88dec775448d"
