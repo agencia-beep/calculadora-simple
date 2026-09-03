@@ -5,6 +5,7 @@ import PipelinePage from "./pages/PipelinePage";
 import SequencesPage from "./pages/SequencesPage";
 import AgentPage from "./pages/AgentPage";
 import CrmPage from "./pages/CrmPage";
+import InboxPage from "./pages/InboxPage";
 import { clearClientToken, getClientToken, getHealth, setClientToken } from "./api";
 import Icon from "./components/Icon";
 
@@ -138,6 +139,10 @@ export default function App() {
             <Icon name="trendingUp" size={16} />
             <span className="sidebar-btn-label">CRM</span>
           </button>
+          <button className={page === "inbox" ? "active" : ""} onClick={() => setPage("inbox")}>
+            <Icon name="zap" size={16} />
+            <span className="sidebar-btn-label">Bandeja</span>
+          </button>
         </nav>
       </aside>
 
@@ -158,6 +163,7 @@ export default function App() {
         {page === "sequences" && <SequencesPage />}
         {page === "agent" && <AgentPage />}
         {page === "crm" && <CrmPage />}
+        {page === "inbox" && <InboxPage />}
       </main>
     </div>
   );

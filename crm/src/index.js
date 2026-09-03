@@ -258,6 +258,55 @@ export default {
       return json({ ok: true, inserted, skipped, total: leads.length });
     }
 
+    // ── GET /inbox ────────────────────────────────────────────────────────────
+    // Leads con actividad reciente, ordenados por última actividad
+    if (path === "/inbox" && request.method === "GET") {
+      const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 100);
+      const filter = url.searchParams.get("filter") || "all"; // all | email | call | responded
+
+      let typeFilter = "";
+      if (filter === "email") typeFilter = "AND a.type IN ('email_sent','followup_sent')";
+      else if (filter === "call") typeFilter = "AND a.type IN ('call_initiated','call_completed')";
+      else if (filter === "responded") typeFilter = "AND a.type IN ('responded','call_completed')";
+
+      const { results } = await env.DB.prepare(`
+        SELECT
+          l.id, l.business_name, l.niche, l.city, l.state, l.stage,
+          l.phone, l.email, l.score,
+          a.type as last_activity_type,
+          a.description as last_activity_desc,
+          a.created_at as last_activity_at
+        FROM leads l
+        INNER JOIN activities a ON a.id = (
+          SELECT id FROM activities
+          WHERE lead_id = l.id ${typeFilter}
+          ORDER BY created_at DESC LIMIT 1
+        )
+        ORDER BY a.created_at DESC
+        LIMIT ?
+      `).bind(limit).all();
+
+      return json({ conversations: results, total: results.length });
+    }
+
+    // ── GET /leads/:id/activities ─────────────────────────────────────────────
+    const activitiesMatch = path.match(/^\/leads\/(\d+)\/activities$/);
+    if (activitiesMatch && request.method === "GET") {
+      const id = activitiesMatch[1];
+      const { results } = await env.DB.prepare(
+        "SELECT * FROM activities WHERE lead_id = ? ORDER BY created_at DESC LIMIT 100"
+      ).bind(id).all();
+      return json({ activities: results });
+    }
+
+    // ── POST /leads/:id/activities ────────────────────────────────────────────
+    if (activitiesMatch && request.method === "POST") {
+      const id = activitiesMatch[1];
+      const body = await request.json();
+      await logActivity(env.DB, id, body.type || "note_added", body.note || body.description || "");
+      return json({ ok: true }, 201);
+    }
+
     return json({ error: "Ruta no encontrada" }, 404);
   },
 };
